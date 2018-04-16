@@ -1,0 +1,33 @@
+接口文档
+
+1.登录接口
+	输入:  	tel(手机号),pwd(密码)
+	返回:  	status --- 登录状态
+		   	token --- 信令
+		   	userId --- 身份编号（可以放在token中）
+
+2.注册接口
+	输入 tel(手机号),pwd(密码),pwd1(密码),captcha(验证码)
+	返回:	status --- 注册状态
+		  	token --- 信令
+		   	userId --- 身份编号（可以放在token中）
+
+3.添加地址
+
+
+4.获取产品列表
+	status --- 状态
+	product_type --- 产品列表(JSONARRAY)
+
+5.获取商品
+	输入 productTypeId --- 产品列表编号
+	返回 
+		status --- 状态
+		products --- 商品列表(JSONARRAY)
+
+
+6.下单
+	输入 userId ,addressId,partnerId(预留)
+	返回
+	status --- 状态
+	orderId ---  订单编号
