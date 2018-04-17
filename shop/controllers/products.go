@@ -13,7 +13,13 @@ type ProductController struct {
 }
 
 func (this *ProductController) Get() {
-	this.TplName = "product.html"
+	var page string
+	this.Ctx.Input.Bind(&page, "page")
+	if page == "product_add" {
+		this.TplName = "product_add.html"
+	} else if page == "product_list" {
+		this.TplName = "product_list.html"
+	}
 }
 
 func (this *ProductController) Post() {
