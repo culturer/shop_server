@@ -12,6 +12,8 @@ type TProductType struct {
 	TypeName string
 	//分销商Id
 	PartnerId int64
+	//创建时间
+	CreateTime string
 }
 
 //查询分类
@@ -33,7 +35,7 @@ func GetProductTypeByPartnerId(partnerId int64) ([]*TProductType, error) {
 
 func AddProductType(typeName string, partnerId int64) (int64, error) {
 	o := orm.NewOrm()
-	productType := &TProductType{TypeName: typeName, PartnerId: partnerId}
+	productType := &TProductType{TypeName: typeName, PartnerId: partnerId, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
 	productTypeId, err := o.Insert(productType)
 	return productTypeId, err
 }

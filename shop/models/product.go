@@ -19,9 +19,11 @@ type TProduct struct {
 	//成本价
 	StandardPrice float64
 	//产品描述
-	Desc string
+	Desc string `orm:"size(5000)"`
 	//产品备注
-	Msg string
+	Msg string `orm:"size(2000)"`
+	//创建时间
+	CreateTime string
 }
 
 func GetProductById(productId int64) (*TProduct, error) {
@@ -42,7 +44,7 @@ func GetProductByType(productTypeId int64) ([]*TProduct, error) {
 
 func AddProduct(productTypeId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
 	o := orm.NewOrm()
-	product := &TProduct{ProductTypeId: productTypeId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg}
+	product := &TProduct{ProductTypeId: productTypeId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
 	pictureId, err := o.Insert(product)
 	return pictureId, err
 }
