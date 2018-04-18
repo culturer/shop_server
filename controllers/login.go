@@ -15,6 +15,7 @@ func (this *LoginController) Get() {
 }
 
 func (this *LoginController) Post() {
+
 	//获取数据信息
 	pwd := this.Input().Get("pwd")
 	tel := this.Input().Get("tel")

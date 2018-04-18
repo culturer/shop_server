@@ -18,11 +18,15 @@ type TPartner struct {
 	Credits int
 	//权限
 	Pro int
+	//排序权重
+	SortId int
+	//位置
+	Position string
 }
 
 func AddPartner(userId int64, partnerName string, addressId int64) (int64, error) {
 	o := orm.NewOrm()
-	partner := &TPartner{UserId: userId, PartnerName: partnerName, AddressId: addressId, Credits: 0, Pro: 0}
+	partner := &TPartner{UserId: userId, PartnerName: partnerName, AddressId: addressId, Credits: 0, Pro: 0, SortId: 0}
 	partnerId, err := o.Insert(partner)
 	return partnerId, err
 }
@@ -89,6 +93,17 @@ func MdfyPartnerPro(partnerId int64, pro int) error {
 		return nil
 	}
 	partner.Pro = pro
+	o := orm.NewOrm()
+	_, err = o.Update(partner)
+	return err
+}
+
+func MdfyPartnerSort(partnerId int64, sortId int) error {
+	partner, err := GetPartnerById(partnerId)
+	if err != nil {
+		return nil
+	}
+	partner.SortId = sortId
 	o := orm.NewOrm()
 	_, err = o.Update(partner)
 	return err

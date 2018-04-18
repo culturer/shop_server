@@ -8,6 +8,8 @@ import (
 //用户
 type TUser struct {
 	Id int64
+	//姓名
+	Name string
 	//手机号
 	Tel string
 	//库存数量

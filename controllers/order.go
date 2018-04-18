@@ -148,6 +148,7 @@ func (this *OrderController) Post() {
 	if options == 3 {
 		// [mdfyType == 0  修改订单状态]
 		// [mdfyType == 1  修改订单地址]
+		// [mdfyType == 2  修改订单优先级]
 		mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
 		if mdfyType == 0 {
 			orderStatus, _ := strconv.Atoi(this.Input().Get("orderStatus"))
@@ -174,6 +175,20 @@ func (this *OrderController) Post() {
 			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改订单成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
+		}
+		if mdfyType == 2 {
+			orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
+			sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+			err := this.mdfyOrderSort(orderId, sortId)
+			if err != nil {
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改订单优先级,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改订单优先级！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+
 		}
 	}
 
@@ -309,6 +324,11 @@ func (this *OrderController) mdfyOrderStatus(orderId int64, orderStatus int) err
 
 func (this *OrderController) mdfyOrderAddress(orderId int64, addressId int64) error {
 	err := models.MdfyOrderAddress(orderId, addressId)
+	return err
+}
+
+func (this *OrderController) mdfyOrderSort(orderId int64, sortId int) error {
+	err := models.MdfyOrderSort(orderId, sortId)
 	return err
 }
 

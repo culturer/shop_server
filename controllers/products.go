@@ -178,6 +178,7 @@ func (this *ProductController) Post() {
 			// [mdfyType == 4  修改成本]
 			// [mdfyType == 5  修改描述]
 			// [mdfyType == 6  修改备注]
+			// [mdfyType == 7  修改优先级]
 			productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
 
 			if mdfyType == 0 {
@@ -274,6 +275,19 @@ func (this *ProductController) Post() {
 					return
 				}
 				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品备注成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			if mdfyType == 7 {
+				sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+				err := models.MdfyProductSort(productId, sortId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品优先级失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品优先级成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}

@@ -42,6 +42,7 @@ func (this *PictureController) Post() {
 	if options == 1 {
 		strProductId := this.Input().Get("productId")
 		productId, _ := strconv.ParseInt(strProductId, 10, 64)
+		isCover, _ := strconv.ParseBool(this.Input().Get("isCover"))
 		//创建用户目录
 		err := os.MkdirAll("pictures/"+strProductId, os.ModePerm)
 		if err != nil {
@@ -70,7 +71,7 @@ func (this *PictureController) Post() {
 				this.ServeJSON()
 				return
 			}
-			pictureId, err := this.addPicture(productId, myPath)
+			pictureId, err := this.addPicture(productId, myPath, isCover)
 			if err != nil {
 				beego.Error(err)
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -106,8 +107,8 @@ func (this *PictureController) Post() {
 
 }
 
-func (this *PictureController) addPicture(productId int64, url string) (int64, error) {
-	pictureId, err := models.AddPicture(productId, url)
+func (this *PictureController) addPicture(productId int64, url string, isCover bool) (int64, error) {
+	pictureId, err := models.AddPicture(productId, url, isCover)
 	return pictureId, err
 }
 

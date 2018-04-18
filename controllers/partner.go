@@ -94,8 +94,9 @@ func (this *PartnerController) Post() {
 	if options == 3 {
 		// [mdfyType == 0  修改分销商名称]
 		// [mdfyType == 1  修改分销商地址]
-		// [mdfyType == 3  修改分销商信用]
-		// [mdfyType == 4  修改分销商权限]
+		// [mdfyType == 2  修改分销商信用]
+		// [mdfyType == 3  修改分销商权限]
+		// [mdfyType == 4  修改分销商排序优先级]
 		mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
 
 		if mdfyType == 0 {
@@ -161,6 +162,21 @@ func (this *PartnerController) Post() {
 			this.ServeJSON()
 			return
 		}
+		if mdfyType == 4 {
+			partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
+			sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+			err := this.mdfyPartnerSort(partnerId, sortId)
+			if err != nil {
+				beego.Info(err.Error())
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改分销商排序优先级异常，请检查后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+
+			this.Data["json"] = map[string]interface{}{"status": 200, "msg": "修改分销商排序优先级成功！", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
 	}
 
 }
@@ -202,5 +218,10 @@ func (this *PartnerController) mdfyPartnerCredits(partnerId int64, credits int) 
 
 func (this *PartnerController) mdfyPartnerPro(partnerId int64, pro int) error {
 	err := models.MdfyPartnerPro(partnerId, pro)
+	return err
+}
+
+func (this *PartnerController) mdfyPartnerSort(partnerId int64, sortId int) error {
+	err := models.MdfyPartnerSort(partnerId, sortId)
 	return err
 }

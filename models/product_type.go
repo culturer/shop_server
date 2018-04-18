@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego/orm"
 	// _ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 //产品分类
@@ -14,6 +15,8 @@ type TProductType struct {
 	PartnerId int64
 	//创建时间
 	CreateTime string
+	//排序权重
+	SortId int
 }
 
 //查询分类
@@ -35,7 +38,7 @@ func GetProductTypeByPartnerId(partnerId int64) ([]*TProductType, error) {
 
 func AddProductType(typeName string, partnerId int64) (int64, error) {
 	o := orm.NewOrm()
-	productType := &TProductType{TypeName: typeName, PartnerId: partnerId, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
+	productType := &TProductType{TypeName: typeName, PartnerId: partnerId, CreateTime: time.Now().Format("2006-01-02 15:04:05"), SortId: 0}
 	productTypeId, err := o.Insert(productType)
 	return productTypeId, err
 }
@@ -53,6 +56,17 @@ func MdfyPartner(productTypeId int64, partnerId int64) error {
 		return nil
 	}
 	productType.PartnerId = partnerId
+	o := orm.NewOrm()
+	_, err = o.Update(productType)
+	return err
+}
+
+func MdfyProductTypeSortId(productTypeId int64, sortId int) error {
+	productType, err := GetProductTypeById(productTypeId)
+	if err != nil {
+		return nil
+	}
+	productType.SortId = sortId
 	o := orm.NewOrm()
 	_, err = o.Update(productType)
 	return err

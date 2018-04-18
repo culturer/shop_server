@@ -92,6 +92,21 @@ func (this *AddressController) Post() {
 		this.ServeJSON()
 		return
 	}
+	if options == 3 {
+		addressId, _ := strconv.ParseInt(this.Input().Get("addressId"), 10, 64)
+		sort_Id, _ := strconv.Atoi(this.Input().Get("sort_Id"))
+		err := this.mdfyAddressSort(addressId, sort_Id)
+		if err != nil {
+			beego.Info(err.Error())
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "修改地址优先级失败，请稍后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		this.Data["json"] = map[string]interface{}{"status": 200, "msg": "修改地址优先级成功！", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+
+	}
 
 }
 
@@ -113,4 +128,9 @@ func (this *AddressController) getAddressById(addressId int64) (*models.TAddress
 func (this *AddressController) getAddressByUserId(userId int64) ([]*models.TAddress, error) {
 	address, err := models.GetAddressByUserId(userId)
 	return address, err
+}
+
+func (this *AddressController) mdfyAddressSort(addressId int64, sort_Id int) error {
+	err := models.MdfyAddressSort(addressId, sort_Id)
+	return err
 }

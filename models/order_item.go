@@ -12,11 +12,13 @@ type TOrderItem struct {
 	OrderId int64
 	//商品Id
 	ProductId int64
+	//排序权重
+	SortId int
 }
 
 func AddOrderItem(productId int64, orderId int64) (int64, error) {
 	o := orm.NewOrm()
-	orderItem := &TOrderItem{OrderId: orderId, ProductId: productId}
+	orderItem := &TOrderItem{OrderId: orderId, ProductId: productId, SortId: 0}
 	orderItemId, err := o.Insert(orderItem)
 	return orderItemId, err
 }
