@@ -25,9 +25,9 @@ type TOrder struct {
 	//付款方式
 	PayType string
 	//实际金额
-	RealPrice float32
+	RealPrice float64
 	//应付金额
-	ShouldPrice float32
+	ShouldPrice float64
 	//金额注释
 	PriceMsg string
 	//分销商
@@ -44,9 +44,9 @@ type TOrder struct {
 	IsComment bool //评论
 }
 
-func AddOrder(userId int64, addressId int64, partnerId int64) (int64, error) {
+func AddOrder(userId int64, addressId int64, address string, payType string, realPrice float64, shouldPrice float64, priceMsg string, partnerId int64) (int64, error) {
 	o := orm.NewOrm()
-	order := &TOrder{UserId: userId, AddressId: addressId, PartnerId: partnerId, CreateTime: time.Now().Format("2006-01-02 15:04:05"), OrderStatus: 0, SortId: 0}
+	order := &TOrder{UserId: userId, AddressId: addressId, Address: address, PayType: payType, PartnerId: partnerId, CreateTime: time.Now().Format("2006-01-02 15:04:05"), OrderStatus: 0, SortId: 0}
 	userId, err := o.Insert(order)
 	return userId, err
 }
@@ -138,12 +138,13 @@ func GetOrderByIdPartnerIdS(partnerId int64, pageNo, pageSize, orderStatus int) 
 
 //修改
 
-func MdfyOrderStatus(orderId int64, orderStatus int) error {
+func MdfyOrderStatus(orderId int64, orderStatus int, payType string) error {
 	order, err := GetOrderById(orderId)
 	if err != nil {
 		return nil
 	}
 	order.OrderStatus = orderStatus
+	order.PayType = payType
 	o := orm.NewOrm()
 	_, err = o.Update(order)
 	return err
@@ -221,6 +222,17 @@ func MdfyOrderSort(orderId int64, sortId int) error {
 		return nil
 	}
 	order.SortId = sortId
+	o := orm.NewOrm()
+	_, err = o.Update(order)
+	return err
+}
+
+func MdfyOrderTranslateStatus(orderId int64, status string) error {
+	order, err := GetOrderById(orderId)
+	if err != nil {
+		return nil
+	}
+	order.TranslateStatus = status
 	o := orm.NewOrm()
 	_, err = o.Update(order)
 	return err

@@ -127,7 +127,13 @@ func (this *OrderController) Post() {
 		userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
 		addressId, _ := strconv.ParseInt(this.Input().Get("addressId"), 10, 64)
 		partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
-		orderId, err := this.addOrder(userId, addressId, partnerId)
+		payType := this.Input().Get("payType")
+		address := this.Input().Get("address")
+		priceMsg := this.Input().Get("priceMsg")
+		realPrice, _ := strconv.ParseFloat(this.Input().Get("realPrice"), 32)
+		shouldPrice, _ := strconv.ParseFloat(this.Input().Get("shouldPrice"), 32)
+
+		orderId, err := this.addOrder(userId, addressId, address, payType, realPrice, shouldPrice, priceMsg, partnerId)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 添加订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -157,11 +163,30 @@ func (this *OrderController) Post() {
 		// [mdfyType == 0  修改订单状态]
 		// [mdfyType == 1  修改订单地址]
 		// [mdfyType == 2  修改订单优先级]
+		// [mdfyType == 3  修改订单物流状态]
 		mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
 		if mdfyType == 0 {
 			orderStatus, _ := strconv.Atoi(this.Input().Get("orderStatus"))
 			orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
-			err := this.mdfyOrderStatus(orderId, orderStatus)
+			//isStatus 订单的具体状态
+			isStatus, _ := strconv.ParseBool(this.Input().Get("isStatus"))
+			//状态标志位
+			isFlag, _ := strconv.Atoi(this.Input().Get("isFlag"))
+			payType := this.Input().Get("payType")
+			switch isFlag {
+			case 0:
+				models.OrderIsPay(orderId, isStatus)
+			case 1:
+				models.OrderIsDlivery(orderId, isStatus)
+			case 2:
+				models.OrderIsSign(orderId, isStatus)
+			case 3:
+				models.OrderIsCash(orderId, isStatus)
+			case 4:
+				models.OrderIsComment(orderId, isStatus)
+			default:
+			}
+			err := this.mdfyOrderStatus(orderId, orderStatus, payType)
 			if err != nil {
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
@@ -193,10 +218,23 @@ func (this *OrderController) Post() {
 				this.ServeJSON()
 				return
 			}
-			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改订单优先级！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改订单优先级成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 
+		}
+		if mdfyType == 3 {
+			orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
+			status := this.Input().Get("status")
+			err := this.mdfyOrderTranslateStatus(orderId, status)
+			if err != nil {
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改订单物流状态,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改订单物流状态成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
 		}
 	}
 
@@ -294,8 +332,8 @@ func (this *OrderController) Post() {
 	return
 }
 
-func (this *OrderController) addOrder(userId int64, addressId int64, partnerId int64) (int64, error) {
-	orderId, err := models.AddOrder(userId, addressId, partnerId)
+func (this *OrderController) addOrder(userId int64, addressId int64, address string, payType string, realPrice float64, shouldPrice float64, priceMsg string, partnerId int64) (int64, error) {
+	orderId, err := models.AddOrder(userId, addressId, address, payType, realPrice, shouldPrice, priceMsg, partnerId)
 	return orderId, err
 }
 
@@ -329,8 +367,8 @@ func (this *OrderController) getOrderByPartnerIdS(partnerId int64, orderStatus i
 	return orders, totalPage, err
 }
 
-func (this *OrderController) mdfyOrderStatus(orderId int64, orderStatus int) error {
-	err := models.MdfyOrderStatus(orderId, orderStatus)
+func (this *OrderController) mdfyOrderStatus(orderId int64, orderStatus int, payType string) error {
+	err := models.MdfyOrderStatus(orderId, orderStatus, payType)
 	return err
 }
 
@@ -341,6 +379,11 @@ func (this *OrderController) mdfyOrderAddress(orderId int64, addressId int64) er
 
 func (this *OrderController) mdfyOrderSort(orderId int64, sortId int) error {
 	err := models.MdfyOrderSort(orderId, sortId)
+	return err
+}
+
+func (this *OrderController) mdfyOrderTranslateStatus(orderId int64, status string) error {
+	err := models.MdfyOrderTranslateStatus(orderId, status)
 	return err
 }
 
