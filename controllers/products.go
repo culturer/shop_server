@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"shop/models"
-	"shop/util"
 	"strconv"
 	"time"
 )
@@ -43,7 +42,7 @@ func (this *ProductController) Post() {
 			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
 			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
 
-			productTypes, err := this.getProductTypes(partnerId)
+			productTypes, totalPage, err := this.getProductTypes(partnerId, pageNo, pageSize, "")
 
 			if err != nil {
 				beego.Info(err.Error())
@@ -52,9 +51,7 @@ func (this *ProductController) Post() {
 				return
 			}
 
-			page := util.PageUtil(len(productTypes), pageNo, pageSize, productTypes)
-
-			this.Data["json"] = map[string]interface{}{"status": 200, "page": page, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.Data["json"] = map[string]interface{}{"status": 200, "productTypes": productTypes, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}
@@ -89,18 +86,38 @@ func (this *ProductController) Post() {
 		}
 
 		if options == 3 {
-			partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
-			productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
-			err := this.mdfyProductTypePartner(productTypeId, partnerId)
-			if err != nil {
-				beego.Info(err.Error())
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品分类失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
+			// [mdfyType == 0  修改分销商]
+			// [mdfyType == 1  修改优先级]
+			if mdfyType == 0 {
+				partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
+				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+				err := this.mdfyProductTypePartner(productTypeId, partnerId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品分类失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品分类成功,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
-			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品分类成功,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
+
+			if mdfyType == 1 {
+				sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+				err := models.MdfyProductTypeSortId(productTypeId, sortId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品分类优先级失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品分类优先级成功,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
 		}
 
 	}
@@ -119,7 +136,7 @@ func (this *ProductController) Post() {
 			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
 			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
 
-			products, err := this.getProducts(productTypeId)
+			products, totalPage, err := this.getProducts(productTypeId, pageNo, pageSize)
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品列表失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -127,22 +144,21 @@ func (this *ProductController) Post() {
 				return
 			}
 
-			page := util.PageUtil(len(products), pageNo, pageSize, products)
-
-			this.Data["json"] = map[string]interface{}{"status": 200, "page": page, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}
 
 		if options == 1 {
 			productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+			userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
 			name := this.Input().Get("name")
 			price, _ := strconv.ParseFloat(this.Input().Get("price"), 32)
 			desc := this.Input().Get("desc")
 			count, _ := strconv.Atoi(this.Input().Get("count"))
 			standardPrice, _ := strconv.ParseFloat(this.Input().Get("standardPrice"), 32)
 			msg := this.Input().Get("msg")
-			productId, err := this.addProduct(productTypeId, name, count, standardPrice, price, desc, msg)
+			productId, err := this.addProduct(productTypeId, userId, name, count, standardPrice, price, desc, msg)
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 新增商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -301,9 +317,9 @@ func (this *ProductController) Post() {
 	return
 }
 
-func (this *ProductController) getProductTypes(partnerId int64) ([]*models.TProductType, error) {
-	productTypes, err := models.GetProductTypeByPartnerId(partnerId)
-	return productTypes, err
+func (this *ProductController) getProductTypes(partnerId int64, pageNo, pageSize int, where string) ([]*models.TProductType, int, error) {
+	productTypes, totalPage, err := models.GetProductTypeByPartnerId(partnerId, pageNo, pageSize, where)
+	return productTypes, totalPage, err
 }
 
 func (this *ProductController) addProductType(typeName string, partnerId int64) (int64, error) {
@@ -321,13 +337,13 @@ func (this *ProductController) mdfyProductTypePartner(productTypeId int64, partn
 	return err
 }
 
-func (this *ProductController) getProducts(productTypeId int64) ([]*models.TProduct, error) {
-	products, err := models.GetProductByType(productTypeId)
-	return products, err
+func (this *ProductController) getProducts(productTypeId int64, pageNo, pageSize int) ([]*models.TProduct, int, error) {
+	products, totalPage, err := models.GetProductByType(productTypeId, pageNo, pageSize, "")
+	return products, totalPage, err
 }
 
-func (this *ProductController) addProduct(productTypeId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
-	productId, err := models.AddProduct(productTypeId, name, count, standardPrice, price, desc, msg)
+func (this *ProductController) addProduct(productTypeId int64, userId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
+	productId, err := models.AddProduct(productTypeId, userId, name, count, standardPrice, price, desc, msg)
 	return productId, err
 }
 

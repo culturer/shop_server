@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// _ "github.com/go-sql-driver/mysql"
 )
 
 //订单商品项
@@ -38,18 +38,55 @@ func GetOrderItemById(orderItemId int64) (*TOrder, error) {
 	return orderItem, err
 }
 
-func GetOrderItemByProductId(productId int64) ([]*TOrderItem, error) {
+func GetOrderItemByProductId(productId int64, pageNo, pageSize int, where string) ([]*TOrderItem, int, error) {
+
 	orderItems := make([]*TOrderItem, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_order_item")
-	_, err := qs.Filter("productr_id", productId).All(&orderItems)
-	return orderItems, err
+	var sql string
+	var num int64
+	var err error
+	if where != "" {
+		sql = "select * from t_order_item where product_id = ? and ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, productId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&orderItems)
+
+	} else {
+		sql = "select * from t_order_item where product_id = ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, productId, pageSize, pageSize*(pageNo-1)).QueryRows(&orderItems)
+	}
+	orderItems1 := make([]*TOrderItem, 0)
+	totalNum, _ := o.Raw("select * from t_order_item where product_id = ? ", productId).QueryRows(&orderItems1)
+	beego.Info(orderItems1)
+	beego.Info(where)
+	beego.Info(num)
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	beego.Info(orderItems)
+	return orderItems, totalPage, err
+
 }
 
-func GetOrderItemByOrderId(orderId int64) ([]*TOrderItem, error) {
+func GetOrderItemByOrderId(orderId int64, pageNo, pageSize int, where string) ([]*TOrderItem, int, error) {
 	orderItems := make([]*TOrderItem, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_order_item")
-	_, err := qs.Filter("order_id", orderId).All(&orderItems)
-	return orderItems, err
+	var sql string
+	var num int64
+	var err error
+	if where != "" {
+		sql = "select * from t_order_item where order_id = ? and ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, orderId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&orderItems)
+	} else {
+		sql = "select * from t_order_item where order_id = ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, orderId, pageSize, pageSize*(pageNo-1)).QueryRows(&orderItems)
+	}
+	orderItems1 := make([]*TOrderItem, 0)
+	totalNum, _ := o.Raw("select * from t_order_item where order_id = ? ", orderId).QueryRows(&orderItems1)
+	beego.Info(orderItems1)
+	beego.Info(where)
+	beego.Info(num)
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	beego.Info(orderItems)
+	return orderItems, totalPage, err
 }

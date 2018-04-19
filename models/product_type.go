@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// _ "github.com/go-sql-driver/mysql"
 	"time"
 )
 
@@ -28,12 +28,30 @@ func GetProductTypeById(typeId int64) (*TProductType, error) {
 	return productType, err
 }
 
-func GetProductTypeByPartnerId(partnerId int64) ([]*TProductType, error) {
+func GetProductTypeByPartnerId(partnerId int64, pageNo, pageSize int, where string) ([]*TProductType, int, error) {
 	productTypes := make([]*TProductType, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_product_type")
-	_, err := qs.Filter("partner_id", partnerId).All(productTypes)
-	return productTypes, err
+	var sql string
+	var num int64
+	var err error
+	if where != "" {
+		sql = "select * from t_product_type where partner_id = ? and ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, partnerId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&productTypes)
+
+	} else {
+		sql = "select * from t_product_type where partner_id = ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, partnerId, pageSize, pageSize*(pageNo-1)).QueryRows(&productTypes)
+	}
+	productTypes1 := make([]*TProductType, 0)
+	totalNum, _ := o.Raw("select * from t_product_type where partner_id = ? ", partnerId).QueryRows(&productTypes1)
+	beego.Info(productTypes1)
+	beego.Info(where)
+	beego.Info(num)
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	beego.Info(productTypes)
+	return productTypes, totalPage, err
 }
 
 func AddProductType(typeName string, partnerId int64) (int64, error) {

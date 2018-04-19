@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// _ "github.com/go-sql-driver/mysql"
 	"time"
 )
 
@@ -10,7 +10,7 @@ import (
 type TAddress struct {
 	Id int64
 	//用户Id
-	Sort_Id int
+	SortId int
 	//排序权重
 	UserId    int64
 	IsDefault bool
@@ -38,7 +38,7 @@ type TAddress struct {
 
 func AddAddress(userId int64, country string, province string, city string, block string, street string, community string, desc string, tel string, name string) (int64, error) {
 	o := orm.NewOrm()
-	address := &TAddress{UserId: userId, Country: country, Province: province, City: city, Block: block, Street: street, Community: community, Desc: desc, Tel: tel, Name: name, Sort_Id: 0, CreateTime: time.Now().Format("2006-01-02 15:04:05"), IsDefault: false}
+	address := &TAddress{UserId: userId, Country: country, Province: province, City: city, Block: block, Street: street, Community: community, Desc: desc, Tel: tel, Name: name, SortId: 0, CreateTime: time.Now().Format("2006-01-02 15:04:05"), IsDefault: false}
 	addressId, err := o.Insert(address)
 	return addressId, err
 }
@@ -58,20 +58,39 @@ func GetAddressById(addressId int64) (*TAddress, error) {
 	return address, err
 }
 
-func GetAddressByUserId(userId int64) ([]*TAddress, error) {
+func GetAddressByUserId(userId int64, pageNo, pageSize int, where string) ([]*TAddress, int, error) {
 	address := make([]*TAddress, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_address")
-	_, err := qs.Filter("user_id", userId).All(&address)
-	return address, err
+	var sql string
+	var num int64
+	var err error
+	if where != "" {
+		sql = "select * from t_address where user_id = ? and ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, userId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&address)
+
+	} else {
+		sql = "select * from t_address where user_id = ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, userId, pageSize, pageSize*(pageNo-1)).QueryRows(&address)
+	}
+	address1 := make([]*TOrder, 0)
+	totalNum, _ := o.Raw("select * from t_address where user_id = ? ", userId).QueryRows(&address1)
+	beego.Info(address1)
+	beego.Info(where)
+	beego.Info(num)
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	beego.Info(address)
+	return address, totalPage, err
+
 }
 
-func MdfyAddressSort(addressId int64, sort_Id int) error {
+func MdfyAddressSort(addressId int64, sortId int) error {
 	address, err := GetAddressById(addressId)
 	if err != nil {
 		return nil
 	}
-	address.Sort_Id = sort_Id
+	address.SortId = sortId
 	o := orm.NewOrm()
 	_, err = o.Update(address)
 	return err

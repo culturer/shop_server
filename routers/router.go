@@ -13,5 +13,13 @@ func init() {
 	//商品相关
 	beego.Router("/products", &controllers.ProductController{})
 	//订单相关
-	beego.Router("/orders", &controllers.OrderController{})
+	beego.Router("/order", &controllers.OrderController{})
+	//分销商相关
+	beego.Router("/partner", &controllers.PartnerController{})
+	//图片相关
+	beego.Router("/picture", &controllers.PictureController{})
+	//用户相关
+	beego.Router("/user", &controllers.UserController{})
+	//地址相关
+	beego.Router("/address", &controllers.AddressController{})
 }

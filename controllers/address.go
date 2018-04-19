@@ -42,15 +42,19 @@ func (this *AddressController) Post() {
 			return
 		}
 		if getType == 1 {
+
 			userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
-			addresses, err := this.getAddressByUserId(userId)
+			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+
+			addresses, totalPage, err := this.getAddressByUserId(userId, pageNo, pageSize, "")
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询地址失败，请稍后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
-			this.Data["json"] = map[string]interface{}{"status": 200, "addresses": addresses, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.Data["json"] = map[string]interface{}{"status": 200, "addresses": addresses, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}
@@ -94,8 +98,8 @@ func (this *AddressController) Post() {
 	}
 	if options == 3 {
 		addressId, _ := strconv.ParseInt(this.Input().Get("addressId"), 10, 64)
-		sort_Id, _ := strconv.Atoi(this.Input().Get("sort_Id"))
-		err := this.mdfyAddressSort(addressId, sort_Id)
+		sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+		err := this.mdfyAddressSort(addressId, sortId)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "修改地址优先级失败，请稍后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -125,12 +129,12 @@ func (this *AddressController) getAddressById(addressId int64) (*models.TAddress
 	return address, err
 }
 
-func (this *AddressController) getAddressByUserId(userId int64) ([]*models.TAddress, error) {
-	address, err := models.GetAddressByUserId(userId)
-	return address, err
+func (this *AddressController) getAddressByUserId(userId int64, pageNo, pageSize int, where string) ([]*models.TAddress, int, error) {
+	address, totalPage, err := models.GetAddressByUserId(userId, pageNo, pageSize, "")
+	return address, totalPage, err
 }
 
-func (this *AddressController) mdfyAddressSort(addressId int64, sort_Id int) error {
-	err := models.MdfyAddressSort(addressId, sort_Id)
+func (this *AddressController) mdfyAddressSort(addressId int64, sortId int) error {
+	err := models.MdfyAddressSort(addressId, sortId)
 	return err
 }

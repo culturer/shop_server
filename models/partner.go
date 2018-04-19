@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// _ "github.com/go-sql-driver/mysql"
 )
 
 //分销商
@@ -46,12 +46,18 @@ func GetPartnerById(partnerId int64) (*TPartner, error) {
 	return partner, err
 }
 
-func GetPartners() ([]*TPartner, error) {
+func GetPartners(pageNo, pageSize int) ([]*TPartner, int, error) {
 	partners := make([]*TPartner, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_partner")
-	_, err := qs.All(&partners)
-	return partners, err
+
+	sql := "select * from t_partner  order by id desc limit ? offset ?"
+	totalNum, err := o.Raw(sql, pageSize, pageSize*(pageNo-1)).QueryRows(&partners)
+
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	return partners, totalPage, err
+
 }
 
 func MdfyPartnerName(partnerId int64, partnerName string) error {

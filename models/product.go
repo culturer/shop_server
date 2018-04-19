@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// _ "github.com/go-sql-driver/mysql"
 	"time"
 )
 
@@ -11,6 +11,7 @@ type TProduct struct {
 	Id int64
 	//排序权重
 	SortId int
+	UserId int64
 	//产品分类
 	ParentId int64
 	//产品名称
@@ -37,17 +38,35 @@ func GetProductById(productId int64) (*TProduct, error) {
 	return product, err
 }
 
-func GetProductByType(parentId int64) ([]*TProduct, error) {
+func GetProductByType(parentId int64, pageNo, pageSize int, where string) ([]*TProduct, int, error) {
 	products := make([]*TProduct, 0)
 	o := orm.NewOrm()
-	qs := o.QueryTable("t_product")
-	_, err := qs.Filter("product_type_id", parentId).All(&products)
-	return products, err
+	var sql string
+	var num int64
+	var err error
+	if where != "" {
+		sql = "select * from t_product where partner_id = ? and ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, parentId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
+
+	} else {
+		sql = "select * from t_product where partner_id = ? order by id desc limit ? offset ?"
+		_, err = o.Raw(sql, parentId, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
+	}
+	products1 := make([]*TProduct, 0)
+	totalNum, _ := o.Raw("select * from t_product where partner_id = ? ", parentId).QueryRows(&products1)
+	beego.Info(products1)
+	beego.Info(where)
+	beego.Info(num)
+	beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	totalPage := mTotalNum/pageSize + 1
+	beego.Info(products)
+	return products, totalPage, err
 }
 
-func AddProduct(parentId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
+func AddProduct(parentId int64, userId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
 	o := orm.NewOrm()
-	product := &TProduct{ParentId: parentId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg, CreateTime: time.Now().Format("2006-01-02 15:04:05"), SortId: 0}
+	product := &TProduct{ParentId: parentId, UserId: userId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg, CreateTime: time.Now().Format("2006-01-02 15:04:05"), SortId: 0}
 	pictureId, err := o.Insert(product)
 	return pictureId, err
 }

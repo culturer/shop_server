@@ -43,7 +43,11 @@ func (this *PartnerController) Post() {
 		}
 
 		if getType == 1 {
-			partners, err := this.getPartners()
+
+			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+
+			partners, totalPage, err := this.getPartners(pageNo, pageSize)
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询分销商异常，请检查后重新查询！", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -51,7 +55,7 @@ func (this *PartnerController) Post() {
 				return
 			}
 
-			this.Data["json"] = map[string]interface{}{"status": 200, "partners": partners, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.Data["json"] = map[string]interface{}{"status": 200, "partners": partners, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}
@@ -196,9 +200,9 @@ func (this *PartnerController) getPartnerById(partnerId int64) (*models.TPartner
 	return partner, err
 }
 
-func (this *PartnerController) getPartners() ([]*models.TPartner, error) {
-	partners, err := models.GetPartners()
-	return partners, err
+func (this *PartnerController) getPartners(pageNo, pageSize int) ([]*models.TPartner, int, error) {
+	partners, totalPage, err := models.GetPartners(pageNo, pageSize)
+	return partners, totalPage, err
 }
 
 func (this *PartnerController) mdfyPartnerName(partnerId int64, partnerName string) error {

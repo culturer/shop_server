@@ -53,14 +53,16 @@ func (this *OrderController) Post() {
 
 			if getType == 1 {
 				userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
-				orders, err := this.getOrderByUserId(userId)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orders, totalPage, err := this.getOrderByUserId(userId, pageNo, pageSize, "")
 				if err != nil {
 					beego.Info(err.Error())
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
@@ -68,28 +70,32 @@ func (this *OrderController) Post() {
 			if getType == 2 {
 				userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
 				orderStatus, _ := strconv.Atoi(this.Input().Get("orderStatus"))
-				orders, err := this.getOrderByUserIdS(userId, orderStatus)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orders, totalPage, err := this.getOrderByUserIdS(userId, orderStatus, pageNo, pageSize)
 				if err != nil {
 					beego.Info(err.Error())
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
 
 			if getType == 3 {
 				partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
-				orders, err := this.getOrderByPartnerId(partnerId)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orders, totalPage, err := this.getOrderByPartnerId(partnerId, pageNo, pageSize, "")
 				if err != nil {
 					beego.Info(err.Error())
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
@@ -97,14 +103,16 @@ func (this *OrderController) Post() {
 			if getType == 4 {
 				partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
 				orderStatus, _ := strconv.Atoi(this.Input().Get("orderStatus"))
-				orders, err := this.getOrderByPartnerIdS(partnerId, orderStatus)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orders, totalPage, err := this.getOrderByPartnerIdS(partnerId, orderStatus, pageNo, pageSize)
 				if err != nil {
 					beego.Info(err.Error())
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询订单异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orders": orders, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
@@ -215,26 +223,30 @@ func (this *OrderController) Post() {
 
 			if getType == 1 {
 				productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
-				orderItems, err := this.getOrderItemByProductId(productId)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orderItems, totalPage, err := this.getOrderItemByProductId(productId, pageNo, pageSize, "")
 				if err != nil {
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": "查询订单项异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orderItems": orderItems, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orderItems": orderItems, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
 
 			if getType == 2 {
 				orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
-				orderItems, err := this.getOrderItemByOrderId(orderId)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				orderItems, totalPage, err := this.getOrderItemByOrderId(orderId, pageNo, pageSize, "")
 				if err != nil {
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": "查询订单项异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 					this.ServeJSON()
 					return
 				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "orderItems": orderItems, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 200, "orderItems": orderItems, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
@@ -297,24 +309,24 @@ func (this *OrderController) getOrderById(orderId int64) (*models.TOrder, error)
 	return order, err
 }
 
-func (this *OrderController) getOrderByUserId(userId int64) ([]*models.TOrder, error) {
-	orders, err := models.GetOrderByUserId(userId)
-	return orders, err
+func (this *OrderController) getOrderByUserId(userId int64, pageNo, pageSize int, where string) ([]*models.TOrder, int, error) {
+	orders, totalPage, err := models.GetOrderByUserId(userId, pageNo, pageSize, where)
+	return orders, totalPage, err
 }
 
-func (this *OrderController) getOrderByUserIdS(userId int64, orderStatus int) ([]*models.TOrder, error) {
-	orders, err := models.GetOrderByUserIdS(userId, orderStatus)
-	return orders, err
+func (this *OrderController) getOrderByUserIdS(userId int64, orderStatus int, pageNo, pageSize int) ([]*models.TOrder, int, error) {
+	orders, totalPage, err := models.GetOrderByUserIdS(userId, orderStatus, pageNo, pageSize)
+	return orders, totalPage, err
 }
 
-func (this *OrderController) getOrderByPartnerId(partnerId int64) ([]*models.TOrder, error) {
-	orders, err := models.GetOrderByPartnerId(partnerId)
-	return orders, err
+func (this *OrderController) getOrderByPartnerId(partnerId int64, pageNo, pageSize int, where string) ([]*models.TOrder, int, error) {
+	orders, totalPage, err := models.GetOrderByPartnerId(partnerId, pageNo, pageSize, where)
+	return orders, totalPage, err
 }
 
-func (this *OrderController) getOrderByPartnerIdS(partnerId int64, orderStatus int) ([]*models.TOrder, error) {
-	orders, err := models.GetOrderByIdPartnerIdS(partnerId, orderStatus)
-	return orders, err
+func (this *OrderController) getOrderByPartnerIdS(partnerId int64, orderStatus int, pageNo, pageSize int) ([]*models.TOrder, int, error) {
+	orders, totalPage, err := models.GetOrderByIdPartnerIdS(partnerId, pageNo, pageSize, orderStatus)
+	return orders, totalPage, err
 }
 
 func (this *OrderController) mdfyOrderStatus(orderId int64, orderStatus int) error {
@@ -337,14 +349,14 @@ func (this *OrderController) getOrderItemById(orderItemId int64) (*models.TOrder
 	return orderItem, err
 }
 
-func (this *OrderController) getOrderItemByProductId(productId int64) ([]*models.TOrderItem, error) {
-	orderItems, err := models.GetOrderItemByProductId(productId)
-	return orderItems, err
+func (this *OrderController) getOrderItemByProductId(productId int64, pageNo, pageSize int, where string) ([]*models.TOrderItem, int, error) {
+	orderItems, totalPage, err := models.GetOrderItemByProductId(productId, pageNo, pageSize, "")
+	return orderItems, totalPage, err
 }
 
-func (this *OrderController) getOrderItemByOrderId(orderId int64) ([]*models.TOrderItem, error) {
-	orderItems, err := models.GetOrderItemByOrderId(orderId)
-	return orderItems, err
+func (this *OrderController) getOrderItemByOrderId(orderId int64, pageNo, pageSize int, where string) ([]*models.TOrderItem, int, error) {
+	orderItems, totalPage, err := models.GetOrderItemByOrderId(orderId, pageNo, pageSize, "")
+	return orderItems, totalPage, err
 }
 
 func (this *OrderController) addOrderItem(productId int64, orderId int64) (int64, error) {
