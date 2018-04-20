@@ -388,8 +388,8 @@ func (this *OrderController) mdfyOrderTranslateStatus(orderId int64, status stri
 }
 
 func (this *OrderController) getOrderItemById(orderItemId int64) (*models.TOrder, error) {
-	orderItem, err := models.GetOrderItemById(orderItemId)
-	return orderItem, err
+	// orderItem, err := models.GetOrderItemById(orderItemId)
+	return nil, nil
 }
 
 func (this *OrderController) getOrderItemByProductId(productId int64, pageNo, pageSize int, where string) ([]*models.TOrderItem, int, error) {

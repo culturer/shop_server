@@ -30,8 +30,8 @@ func DelOrderItem(orderItemId int64) error {
 	return err
 }
 
-func GetOrderItemById(orderItemId int64) (*TOrder, error) {
-	orderItem := new(TOrder)
+func GetOrderItemById(orderItemId int64) (*TOrderItem, error) {
+	orderItem := new(TOrderItem)
 	o := orm.NewOrm()
 	qs := o.QueryTable("t_order_item")
 	err := qs.Filter("id", orderItemId).One(orderItem)

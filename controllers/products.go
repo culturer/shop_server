@@ -23,8 +23,8 @@ func (this *ProductController) Get() {
 
 func (this *ProductController) Post() {
 
-	// [types == 0  获取商品分类列表]
-	// [types == 1  获取商品列表]
+	// [types == 0  获取商品分类]
+	// [types == 1  获取商品]
 	types, _ := strconv.Atoi(this.Input().Get("types"))
 	options, _ := strconv.Atoi(this.Input().Get("options"))
 
@@ -54,6 +54,7 @@ func (this *ProductController) Post() {
 			this.Data["json"] = map[string]interface{}{"status": 200, "productTypes": productTypes, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
+
 		}
 
 		if options == 1 {
@@ -122,7 +123,7 @@ func (this *ProductController) Post() {
 
 	}
 
-	// [types == 1  获取商品列表]
+	// [types == 1  获取商品]
 	if types == 1 {
 
 		// [options == 0  查询]
@@ -132,21 +133,43 @@ func (this *ProductController) Post() {
 
 		if options == 0 {
 
-			productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
-			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
-			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+			getType, _ := strconv.Atoi(this.Input().Get("getType"))
+			// [getType == 0 获取商品列表]
+			// [getType == 1 获取指定商品]
 
-			products, totalPage, err := this.getProducts(productTypeId, pageNo, pageSize)
-			if err != nil {
-				beego.Info(err.Error())
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品列表失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			if getType == 0 {
+				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+
+				products, totalPage, err := this.getProducts(productTypeId, pageNo, pageSize)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品列表失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+
+				this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
 
-			this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
+			if getType == 1 {
+				productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
+				product, err := this.getProduct(productId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+
+				this.Data["json"] = map[string]interface{}{"status": 200, "product": product, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+
 		}
 
 		if options == 1 {
@@ -294,6 +317,7 @@ func (this *ProductController) Post() {
 				this.ServeJSON()
 				return
 			}
+
 			if mdfyType == 7 {
 				sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
 				err := models.MdfyProductSort(productId, sortId)
@@ -307,7 +331,6 @@ func (this *ProductController) Post() {
 				this.ServeJSON()
 				return
 			}
-
 		}
 
 	}
@@ -335,6 +358,11 @@ func (this *ProductController) delProductType(productTypeId int64) error {
 func (this *ProductController) mdfyProductTypePartner(productTypeId int64, partnerId int64) error {
 	err := models.MdfyPartner(productTypeId, partnerId)
 	return err
+}
+
+func (this *ProductController) getProduct(productId int64) (*models.TProduct, error) {
+	product, err := models.GetProductById(productId)
+	return product, err
 }
 
 func (this *ProductController) getProducts(productTypeId int64, pageNo, pageSize int) ([]*models.TProduct, int, error) {
