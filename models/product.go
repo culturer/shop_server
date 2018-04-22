@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
+	//"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -43,7 +43,7 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	products := make([]*TProduct, 0)
 	o := orm.NewOrm()
 	var sql string
-	var num int64
+	//var num int64
 	var err error
 	if where != "" {
 		sql = "select * from t_product where product_type_id = ? and ? order by id desc limit ? offset ?"
@@ -55,15 +55,15 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	}
 	products1 := make([]*TProduct, 0)
 	totalNum, _ := o.Raw("select * from t_product where product_type_id = ? ", productTypeId).QueryRows(&products1)
-	beego.Info(sql)
-	beego.Info(products1)
-	beego.Info(where)
-	beego.Info(num)
-	beego.Info(totalNum)
-	mTotalNum := int(totalNum)
-	totalPage := mTotalNum/pageSize + 1
-	beego.Info(products)
-	return products, totalPage, err
+	// beego.Info(sql)
+	// beego.Info(products1)
+	// beego.Info(where)
+	// beego.Info(num)
+	// beego.Info(totalNum)
+	// mTotalNum := int(totalNum)
+	// totalPage := mTotalNum/pageSize + 1
+	// beego.Info(products)
+	return products, int(totalNum), err
 }
 
 func AddProduct(productTypeId int64, userId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {

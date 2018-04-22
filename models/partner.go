@@ -13,7 +13,7 @@ type TPartner struct {
 	//分析商名称
 	PartnerName string
 	//地址
-	AddressId int64
+	Address string
 	//积分
 	Credits int
 	//权限
@@ -22,11 +22,13 @@ type TPartner struct {
 	SortId int
 	//位置
 	Position string
+	//添加时间
+	Add_time string
 }
 
-func AddPartner(userId int64, partnerName string, addressId int64) (int64, error) {
+func AddPartner(userId int64, partnerName string, address string) (int64, error) {
 	o := orm.NewOrm()
-	partner := &TPartner{UserId: userId, PartnerName: partnerName, AddressId: addressId, Credits: 0, Pro: 0, SortId: 0}
+	partner := &TPartner{UserId: userId, PartnerName: partnerName, Address: address, Credits: 0, Pro: 0, SortId: 0}
 	partnerId, err := o.Insert(partner)
 	return partnerId, err
 }
@@ -71,12 +73,12 @@ func MdfyPartnerName(partnerId int64, partnerName string) error {
 	return err
 }
 
-func MdfyPartnerAddress(partnerId int64, addressId int64) error {
+func MdfyPartnerAddress(partnerId int64, address string) error {
 	partner, err := GetPartnerById(partnerId)
 	if err != nil {
 		return nil
 	}
-	partner.AddressId = addressId
+	partner.Address = address
 	o := orm.NewOrm()
 	_, err = o.Update(partner)
 	return err
