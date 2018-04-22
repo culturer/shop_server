@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"time"
@@ -49,11 +50,12 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 		_, err = o.Raw(sql, productTypeId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
 
 	} else {
-		sql = "select * from t_product where product_type_id = ? order by id desc limit ? offset ?"
-		_, err = o.Raw(sql, productTypeId, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
+		sql = fmt.Sprintf("select * from t_product where product_type_id = %v order by id desc limit %v offset %v", productTypeId, pageSize, pageSize*(pageNo-1))
+		_, err = o.Raw(sql).QueryRows(&products)
 	}
 	products1 := make([]*TProduct, 0)
 	totalNum, _ := o.Raw("select * from t_product where product_type_id = ? ", productTypeId).QueryRows(&products1)
+	beego.Info(sql)
 	beego.Info(products1)
 	beego.Info(where)
 	beego.Info(num)

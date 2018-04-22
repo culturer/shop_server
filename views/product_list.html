@@ -50,7 +50,7 @@
         <el-container style="height:100vh;">
             <el-header>
                 <el-row :gutter="10">
-                    <el-col :span="18">
+                    <el-col :span="16">
                         <el-input placeholder="请输入内容" class="input-with-select">
                             <el-select value="1" slot="prepend" placeholder="请选择">
                                 <el-option label="全部类型" value="1"></el-option>
@@ -61,9 +61,10 @@
                         </el-input>
                     </el-col>
                    
-                    <el-col :span="6" style="text-align:right">
+                    <el-col :span="8" style="text-align:right">
                         <el-button @click="toggleSelection()">取消选择</el-button>
-                        <el-button>移除</el-button>
+                        <el-button type="warning">移除</el-button>
+                        <el-button type="success" @click="location.href='products?page=product_add'">新增</el-button>
                     </el-col>
                 </el-row>
                 
@@ -73,6 +74,7 @@
                 <template>
 
                     <el-table :data="tableData"
+                              v-loading="loading"
                               ref="multipleTable"
                               style="width: 100%"
                               stripe
@@ -147,8 +149,8 @@
                 tableData: "",
                 pageSize: "3",
                 pageTotal:"0",
-                currentPage:"1"
-
+                currentPage:"1",
+                loading: true
             },
             methods: {
 
@@ -160,7 +162,11 @@
                     console.log(`当前页    ${val}`);
                 },
                 deleteProduct(id) {
-                    alert(id)
+                    var result = confirm("移除后数据不可恢复")
+                    if (result) {
+                        deleteData(id)
+                    }
+                    
                 },
                 toggleSelection(rows) {
                     if (rows) {
@@ -181,30 +187,62 @@
         //初始化数据
         function initData() {
             $.ajax({
-                url: location.origin + "/products?page=product",
+                url: location.origin + "/products",
                 data: {
                     types: 1,
                     options: 0,
-                    productTypeId:1
+                    productTypeId: 1,
+                    getType: 0,
+                    pageNo: 1,
+                    pageSize:2
+
                 },
                 type: "post",
                 dataType: "json",
                 success: function (e) {
-
                     if (e.status == "200") {
                         var list = e.products;
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)
-                        
+                            list[i].Name = decodeURIComponent(list[i].Name)                        
                         }
                         vm.tableData = list
                         vm.pageTotal = list.length
+                        vm.loading = false
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
                 },
                 complete: function (e) {
                    // $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //删除数据
+        function deleteData(id) {
+            $.ajax({
+                url: location.origin + "/products?page=product",
+                data: {
+                    types: 1,
+                    options: 2,
+                    productId: id
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                      
+                        vm.tableData = vm.tableData .filter(item => { return item.Id != id })
+                       // vm.pageTotal = list.length
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    // $("body").loader("hide")
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("状态：" + textStatus + "；出错提示：" + errorThrown);
