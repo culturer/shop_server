@@ -15,6 +15,8 @@ type TProduct struct {
 	UserId int64
 	//产品分类
 	ProductTypeId int64
+	//产品分类
+	PartnerId int64
 	//产品名称
 	Name string
 	//库存量

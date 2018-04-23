@@ -86,7 +86,7 @@
                         <el-table-column prop="Address"
                                          label="地址"
                                          sortable
-                                         width="180">
+                                        >
                         </el-table-column>
                         <el-table-column prop="Credits"
                                          sortable
@@ -203,7 +203,9 @@
                     if (e.status == "200") {
                         var list = e.partners;
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)                        
+                            list[i].Address = decodeURIComponent(list[i].Address) 
+                            list[i].PartnerName = decodeURIComponent(list[i].PartnerName)
+                           
                         }
                         vm.tableData = list
                         vm.pageTotal = e.totalPage
@@ -223,11 +225,11 @@
         //删除数据
         function deleteData(id) {
             $.ajax({
-                url: location.origin + "/products?page=product",
+                url: location.origin + "/partner",
                 data: {
-                    types: 1,
+                    //types: 1,
                     options: 2,
-                    productId: id
+                    partnerId: id
                 },
                 type: "post",
                 dataType: "json",
@@ -235,7 +237,8 @@
 
                     if (e.status == "200") {
                       
-                        vm.tableData = vm.tableData .filter(item => { return item.Id != id })
+                        vm.tableData = vm.tableData.filter(item => { return item.Id != id })
+                        vm.pageTotal = vm.tableData.length
                        // vm.pageTotal = list.length
                     } else if (e.status == "400") {
                         alert(e.msg)

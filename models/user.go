@@ -41,7 +41,7 @@ func GetUserByTel(tel string) (*TUser, error) {
 //新建用户
 func AddUser(tel string, password string) (int64, error) {
 	o := orm.NewOrm()
-	user := &TUser{Password: password, Tel: tel}
+	user := &TUser{Password: password, Tel: tel, Prov: 0}
 	userId, err := o.Insert(user)
 	return userId, err
 }

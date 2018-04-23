@@ -157,9 +157,11 @@
                 handleSizeChange(val) {
                     console.log(`每页 ${val} 条`);
                     this.pageSize = val
+                    getPageData(this.currentPage, this.pageSize);
                 },
                 handleCurrentChange(val) {
                     console.log(`当前页    ${val}`);
+                    getPageData(val, this.pageSize);
                 },
                 deleteProduct(id) {
                     var result = confirm("移除后数据不可恢复")
@@ -183,9 +185,12 @@
             }
 
         });
-        initData();
+        getPageData(1,2);
         //初始化数据
-        function initData() {
+        function getPageData(pageNo, pageSize) {
+            vm.currentPage = pageNo;
+            vm.pageSize = pageSize;
+
             $.ajax({
                 url: location.origin + "/products",
                 data: {
@@ -193,8 +198,8 @@
                     options: 0,
                     productTypeId: 1,
                     getType: 0,
-                    pageNo: 1,
-                    pageSize:2
+                    pageNo: pageNo,
+                    pageSize: pageSize
 
                 },
                 type: "post",
@@ -235,7 +240,8 @@
 
                     if (e.status == "200") {
                       
-                        vm.tableData = vm.tableData .filter(item => { return item.Id != id })
+                        vm.tableData = vm.tableData.filter(item => { return item.Id != id })
+                        vm.pageTotal = vm.tableData.length
                        // vm.pageTotal = list.length
                     } else if (e.status == "400") {
                         alert(e.msg)

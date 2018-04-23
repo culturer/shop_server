@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"time"
 )
 
 //分销商
@@ -22,13 +23,15 @@ type TPartner struct {
 	SortId int
 	//位置
 	Position string
+	//备注
+	Desc string
 	//添加时间
 	Add_time string
 }
 
-func AddPartner(userId int64, partnerName string, address string) (int64, error) {
+func AddPartner(userId int64, partnerName string, address, position, desc string) (int64, error) {
 	o := orm.NewOrm()
-	partner := &TPartner{UserId: userId, PartnerName: partnerName, Address: address, Credits: 0, Pro: 0, SortId: 0}
+	partner := &TPartner{UserId: userId, PartnerName: partnerName, Address: address, Position: position, Desc: desc, Credits: 0, Pro: 0, SortId: 0, Add_time: time.Now().Format("2006-01-02 15:04:05")}
 	partnerId, err := o.Insert(partner)
 	return partnerId, err
 }
@@ -53,12 +56,15 @@ func GetPartners(pageNo, pageSize int) ([]*TPartner, int, error) {
 	o := orm.NewOrm()
 
 	sql := "select * from t_partner  order by id desc limit ? offset ?"
+	if pageSize == 0 {
+		sql = "select * from t_partner  order by id desc "
+	}
 	totalNum, err := o.Raw(sql, pageSize, pageSize*(pageNo-1)).QueryRows(&partners)
-
+	totalNum, _ = o.Raw("select * from t_partner ").QueryRows(new([]TPartner))
 	beego.Info(totalNum)
 	mTotalNum := int(totalNum)
-	totalPage := mTotalNum/pageSize + 1
-	return partners, totalPage, err
+	//totalPage := mTotalNum/pageSize + 1
+	return partners, mTotalNum, err
 
 }
 

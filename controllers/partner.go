@@ -69,10 +69,13 @@ func (this *PartnerController) Post() {
 	}
 
 	if options == 1 {
-		userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
+		var userId int64
+		userId, _ = (this.GetSession("uid")).(int64)
 		address := this.Input().Get("address")
 		partnerName := this.Input().Get("partnerName")
-		partnerId, err := this.addPartner(userId, partnerName, address)
+		position := this.Input().Get("position")
+		desc := this.Input().Get("desc")
+		partnerId, err := this.addPartner(userId, partnerName, address, position, desc)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 添加分销商异常，请检查后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -191,8 +194,8 @@ func (this *PartnerController) Post() {
 
 }
 
-func (this *PartnerController) addPartner(userId int64, partnerName string, address string) (int64, error) {
-	partnerId, err := models.AddPartner(userId, partnerName, address)
+func (this *PartnerController) addPartner(userId int64, partnerName string, address, position, desc string) (int64, error) {
+	partnerId, err := models.AddPartner(userId, partnerName, address, position, desc)
 	return partnerId, err
 }
 

@@ -2,7 +2,9 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"shop/controllers"
+	_ "shop/models"
 )
 
 func init() {
@@ -24,4 +26,17 @@ func init() {
 	beego.Router("/address", &controllers.AddressController{})
 	//获取信息接口
 	beego.Router("/get", &controllers.GetController{})
+	var FilterUser = func(ctx *context.Context) {
+
+		if ctx.Request.RequestURI != "/login" {
+			_, ok := ctx.Input.Session("uid").(int)
+			if !ok {
+				ctx.Redirect(302, "/login")
+			}
+
+		}
+	}
+
+	beego.InsertFilter("/*", beego.BeforeRouter, FilterUser)
+
 }
