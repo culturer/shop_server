@@ -23,7 +23,7 @@ func GetProductTypeBean(productTypeId int64) (*ProductTypeBean, error) {
 			return nil, err
 		}
 	}
-	partner, err := GetPartnerBean(productType.PartnerId)
+	partner, err := GetPartnerBean(productType.SortId)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@
 
 <body style="margin:0;box-sizing:border-box">
     <ol class="breadcrumb" style="position:fixed;top:0;width:100vw">
-        <li><a href="product_list.html">商品列表</a></li>
+        <li><a href="/products/?page=product_list">商品列表</a></li>
 
         <li class="active">商品添加</li>
     </ol>
@@ -40,22 +40,22 @@
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-6"><input id="attr_count" required type="number" class="form-control" placeholder="库存" /></div>
-                <div class="col-sm-6">
-                    <select required id="attr_productTypeId"class="form-control" >
+                <div class="col-sm-4"><input id="attr_count" required type="number" class="form-control" placeholder="库存" /></div>
+                <div class="col-sm-4">
+                    <select required id="attr_productTypeId" class="form-control">
                         <option value="1">商品分类</option>
                     </select>
                 </div>
+               
             </div>
 
 
         </div>
-        <div class="form-group" id="on_upload">
-            <input id="file_names" name="file_names" value="" type="hidden" />
-            <input id="file_paths" name="file_paths" value="" type="hidden" />
-            <input id="file_exts" name="file_exts" value="" type="hidden" />
-            <input id="file_sizes" name="file_sizes" value="" type="hidden" />
-            <input name="Filedata" type="file" multiple="multiple" id="ssi-upload" />
+        <div class="form-group" id="on_upload">           
+            <input class="form-control" name="Filedata" type="file"  id="attachment" />
+            <div class="row" id="viewPictrues">
+
+            </div>
         </div>
 
         <p>详情描述</p>
@@ -75,14 +75,45 @@
     <script type="text/javascript" src="../static/js/center-loader.js"></script>
     <script type="text/javascript">
         $("#attr_desc").summernote({ lang: "zh-CN", height: 400});
-        $('#ssi-upload').ssi_uploader({
-            url: 'url',
-            data: { Folder: "Upload\\Tmp" },
-            locale: "ch",
-            allowed: ['jpg', 'jpeg', 'png', 'bmp', 'gif'],
-            dropZone: false
-        });
-
+        //$('#attachment').ssi_uploader({
+        //    url: 'url',
+        //    data: { Folder: "Upload\\Tmp" },
+        //    locale: "ch",
+        //    allowed: ['jpg', 'jpeg', 'png', 'bmp', 'gif'],
+        //    dropZone: false
+        //});
+        var allowed = ['jpg', 'jpeg', 'png', 'bmp', 'gif']
+        $("#attachment").change(function () {
+            var imgs_list = new Array()
+            var imgs = document.getElementById('attachment').files
+            for (var i = 0; i < imgs.length; i++) {
+                imgs_list[i] = imgs[i]
+            }
+            imgs_list= imgs_list.filter(img => {
+                var count = allowed.filter(type => { return type == img.type.split('/')[1] })
+                if (count.length == 0) {
+                    
+                    return false
+                } else {
+                    return true
+                }
+            })
+            //读取缓存图片
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                //options.imgSrc = e.target.result;
+                $("#viewPictrues").append(builtViewPictrue(e.target.result))
+            }
+            for (var i = 0; i < imgs_list.length; i++) {
+                reader.readAsDataURL(imgs_list[i]);
+            }
+          
+           // $("#attachment").parent().append('<img src="''"/>')
+       
+           // document.getElementById('attachment').files = JSON.parse(imgs_list)
+            //console.log(imgs.length)
+        })
+        //新增商品
         function submitProduct() {
 
             $('input[required]').each(function () {
@@ -114,10 +145,12 @@
                 success: function (e) {
 
                     if (e.status == "200") {
-                        var e = confirm("添加成功是否重新加载")
-                        if (e == true) {
-                            location.reload()
-                        }
+                        var product_id = e.productId
+                        submitPictures(product_id)
+                        //var e = confirm("添加成功是否重新加载")
+                        //if (e == true) {
+                        //    location.reload()
+                        //}
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
@@ -129,6 +162,55 @@
                     alert("状态：" + textStatus + "；出错提示：" + errorThrown);
                 },
             });
+        }
+        //提交当产品图片
+        function submitPictures(productId) {
+            var pictrues = $(".proPictrue")
+            var count = pictrues.length;
+            $(".proPictrue").each((index,item) => {
+                var isCover = 0;
+                if ($(item).find('input[name="isCover"]').is(':checked')) {
+                    isCover = 1;
+                }
+                var formdata = new FormData();
+                formdata.append("attachment", getBlob($(item).find('img.prePictrue').attr('src')), new Date().getTime()+ '.png');
+                formdata.append("options", "1")
+                formdata.append("isCover", isCover)
+                formdata.append("productId", productId)
+                var oReq = new XMLHttpRequest();
+                oReq.open("POST", location.origin + "/picture");
+                oReq.send(formdata);
+                oReq.onreadystatechange = function () {
+                    if (oReq.readyState == 4 && oReq.status == 200) {
+                        alert(oReq.responseText)
+                    }
+                }
+            })
+           
+        }
+        //构建图片相册
+        function builtViewPictrue(src) {
+           
+            var img = '<div class="proPictrue" style="padding:10px;float:left"><p style=""><a onclick="$(this).parent().parent().remove()">删除</a></p><img class="prePictrue" src="' + src + '" style="max-width:100px;height:auto;"/><br><input type="radio" name="isCover"/>&nbsp;是否设置为封面</div>'
+            return img
+        }
+        //base64图片转换
+        function getBlob(src) {
+            //canvas转换
+            var img = new Image()
+            img.src = src;
+            canvas = document.createElement("canvas")
+            var context = canvas.getContext("2d");
+            context.drawImage(img,0,0);
+            var imageData = canvas.toDataURL('image/png');
+            //base64编码
+            var b64 = imageData.replace('data:image/png;base64,', '');
+            var binary = atob(b64);
+            var array = [];
+            for (var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new Blob([new Uint8Array(array)], { type: 'image/png' });
         }
     </script>
 </body>
