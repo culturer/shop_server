@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>商品列表</title>
+    <title>合作商管理</title>
     <link rel="stylesheet" type="text/css" href="../static/css/element.css">
     <style>
         .el-header, .el-footer {
@@ -29,7 +29,7 @@
         }
         .el-main {
             padding:10px;
-            overflow-y:scroll
+            overflow:hidden
         }
         .nav-tab {
             background-color: #E9EEF3;
@@ -51,25 +51,15 @@
             <el-header>
                 <el-row :gutter="10">
                     <el-col :span="16">
-
-                        <el-input placeholder="请输入内容" class="input-with-select">
-                            <el-select style="width:100px;max-width:200px" v-model="productTypeId" slot="prepend" placeholder="全部">
-                                <el-option label="全部" value="0">
-
-                                </el-option>
-                                <el-option :label="item.TypeName" v-for="item in typeList" :value="item.Id">
-
-                                </el-option>
-
-                            </el-select>
+                        <el-input placeholder="请输入地址或者合作商名称" class="input-with-select">                            
                             <el-button slot="append" icon="el-icon-search"></el-button>
                         </el-input>
                     </el-col>
                    
                     <el-col :span="8" style="text-align:right">
                         <el-button @click="toggleSelection()">取消选择</el-button>
-                        <el-button type="warning" @click="batchDelete()">移除</el-button>
-                        <el-button type="success" @click="location.href='?page=product_add'">新增</el-button>
+                        <el-button type="warning">移除</el-button>
+                        <el-button type="success" @click="location.href='partner?page=partner_add'">新增</el-button>
                     </el-col>
                 </el-row>
                 
@@ -82,27 +72,25 @@
                               v-loading="loading"
                               ref="multipleTable"
                               style="width: 100%"
-                              @select="selectOne"
-                              @select-all="selectAll"
                               stripe
                               :default-sort="{prop: 'date', order: 'descending'}">
                         <el-table-column type="selection"
                                          prop="Id"
                                          width="40">
                         </el-table-column>
-                        <el-table-column prop="Name"
-                                         label="标题"
+                        <el-table-column prop="PartnerName"
+                                         label="名称"
                                          sortable
                                          width="380">
                         </el-table-column>
-                        <el-table-column prop="Price"
-                                         label="价格"
+                        <el-table-column prop="Address"
+                                         label="地址"
                                          sortable
-                                         width="180">
+                                        >
                         </el-table-column>
-                        <el-table-column prop="Count"
+                        <el-table-column prop="Credits"
                                          sortable
-                                         label="库存">
+                                         label="积分">
                         </el-table-column>
                         <el-table-column prop="Add_time"
                                          sortable
@@ -112,7 +100,7 @@
                                          sortable
                                          label="操作">
                             <template slot-scope="scope">
-                                <el-button @click.native.prevent="goToEditPage(scope.row.Id)"
+                                <el-button @click.native.prevent="location.href='products?page=product_add'"
                                            type="text"
                                            size="small">
                                     编辑
@@ -152,25 +140,23 @@
         var vm = new Vue({
             el: '#app',
             data: {
-                selectIds:[],
+
                 tableData: "",
                 pageSize: "3",
                 pageTotal:"0",
                 currentPage:"1",
-                loading: true,
-                typeList: "",
-                productTypeId:0
+                loading: true
             },
             methods: {
 
                 handleSizeChange(val) {
                     console.log(`每页 ${val} 条`);
                     this.pageSize = val
-                    getPageData(this.currentPage, this.pageSize, this.productTypeId);
+                    getPageData(this.currentPage, this.pageSize);
                 },
                 handleCurrentChange(val) {
                     console.log(`当前页    ${val}`);
-                    getPageData(val, this.pageSize, this.productTypeId);
+                    getPageData(val, this.pageSize);
                 },
                 deleteProduct(id) {
                     var result = confirm("移除后数据不可恢复")
@@ -178,9 +164,6 @@
                         deleteData(id)
                     }
                     
-                },
-                goToEditPage(id) {
-                    location.href ='?page=product_edit&productId='+id
                 },
                 toggleSelection(rows) {
                     if (rows) {
@@ -190,52 +173,26 @@
                     } else {
                         this.$refs.multipleTable.clearSelection();
                     }
-                },
-                selectOne(item, row) {
-                    if (item.length == 0) {
-                        this.selectIds = this.selectIds.filter(obj => { return obj != row.Id })
-                    } else {
-                        this.selectIds.push(row.Id)
-                    }
-                    //console.log(vm.tableData)
-
-                },
-                selectAll(items) {
-                    if (items.length == 0) {
-                        this.selectIds = []
-                    } else {
-                        for (var i = 0; i < items.length; i++) {
-                            this.selectIds.push(items[i].Id)
-                        }
-                       
-                    }
-
-                },
-
+                }
                
             
 
-            },
-            watch: {
-                productTypeId: function (val) {
-                    getPageData(this.currentPage, this.pageSize, this.productTypeId);
-                }
             }
 
         });
-        getPageData(1,2,0);
+        getPageData(1,2);
         //初始化数据
-        function getPageData(pageNo, pageSize, productTypeId) {
+        function getPageData(pageNo, pageSize) {
             vm.currentPage = pageNo;
             vm.pageSize = pageSize;
 
             $.ajax({
-                url: location.origin + "/products",
+                url: location.origin + "/partner",
                 data: {
                     types: 1,
                     options: 0,
-                    productTypeId: productTypeId,
-                    getType: 0,
+                   // productTypeId: 1,
+                    getType: 1,
                     pageNo: pageNo,
                     pageSize: pageSize
 
@@ -244,9 +201,11 @@
                 dataType: "json",
                 success: function (e) {
                     if (e.status == "200") {
-                        var list = e.products;
+                        var list = e.partners;
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)                        
+                            list[i].Address = decodeURIComponent(list[i].Address) 
+                            list[i].PartnerName = decodeURIComponent(list[i].PartnerName)
+                           
                         }
                         vm.tableData = list
                         vm.pageTotal = e.totalPage
@@ -266,21 +225,20 @@
         //删除数据
         function deleteData(id) {
             $.ajax({
-                url: location.origin + "/products?page=product",
+                url: location.origin + "/partner",
                 data: {
-                    types: 1,
+                    //types: 1,
                     options: 2,
-                    productId: id
+                    partnerId: id
                 },
                 type: "post",
                 dataType: "json",
-                async: false,
                 success: function (e) {
 
                     if (e.status == "200") {
-                        getPageData(1, vm.pageSize);
-                        //vm.tableData = vm.tableData.filter(item => { return item.Id != id })
-                        //vm.pageTotal = vm.tableData.length
+                      
+                        vm.tableData = vm.tableData.filter(item => { return item.Id != id })
+                        vm.pageTotal = vm.tableData.length
                        // vm.pageTotal = list.length
                     } else if (e.status == "400") {
                         alert(e.msg)
@@ -294,57 +252,7 @@
                 },
             });
         }
-        //批量删除
-        function batchDelete() {
-            if (vm.selectIds.length == 0) {
-                alert("请选择表格中要删除的数据")
-            }
-            var e = confirm("数据删除将无法恢复")
-            if (e) {
-                for (var i = 0; i < vm.selectIds.length; i++) {
-                    deleteData(vm.selectIds[i])
-                }
-            }
-            console.log(vm.tableData)
-           
-        }
-        getTypeData(1, 0);
-        //获取类型数据
-        function getTypeData(pageNo, pageSize) {          
 
-            $.ajax({
-                url: location.origin + "/products",
-                data: {
-                    types: 0,
-                    options: 0,
-                    // productTypeId: 1,
-                    //getType: 0,
-                    pageNo: pageNo,
-                    pageSize: pageSize
-
-                },
-                type: "post",
-                dataType: "json",
-                success: function (e) {
-                    if (e.status == "200") {
-                        var list = e.productTypes;
-                        for (var i = 0; i < list.length; i++) {
-                            list[i].TypeName = decodeURIComponent(list[i].TypeName)
-                        }
-                        vm.typeList = list
-                    } else if (e.status == "400") {
-                        alert(e.msg)
-                    }
-                },
-                complete: function (e) {
-                    // $("body").loader("hide")
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
-                },
-            });
-        }
-        //
     </script>
 </body>
 </html>

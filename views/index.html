@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Epr首页管理</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/element.css">
+    <style>
+        .el-header, .el-footer {
+            background-color: #B3C0D1;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-aside {
+            background-color: #D3DCE6;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-main {
+            background-color: #ffffff;
+            color: #333;
+            text-align: center;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+        /*---------*/
+        .main-contaner {
+            padding: 0;
+        }
+        .el-main {
+            padding:10px;
+            overflow:hidden
+        }
+        .nav-tab {
+            background-color: #E9EEF3;
+        }
+         .el-tabs.el-tabs--card.el-tabs--top {
+            height: 100%
+        }
+        .el-tabs__content {
+        height:calc(100% - 41px)
+        }
+    </style>
+</head>
+
+
+<body style="margin:0;box-sizing:border-box">
+
+    <div id="app">
+        <el-container style="height:100vh;">
+            <el-header class="bg-blue">
+                <p> 广州新零售管理后台 <span style="float:right">用户：{{ decodeURIComponent(user.Name) }}<el-button style="margin-left:1em" @click="loginOut()">退出登陆</el-button> </span> </p>
+            </el-header>
+            <el-container>
+                <el-aside width="200px">
+
+                    <el-menu default-active="1-4-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse" background-color="#D3DCE6"
+                        active-text-color="#409EFF">
+                        <el-submenu index="1">
+                            <template slot="title">
+                                <i class="el-icon-location"></i>
+                                <span slot="title">商品管理</span>
+                            </template>
+
+                            <el-menu-item index="1-1" title="分类列表" href="#fenlei" @click="addTab(proTypeData)">分类列表</el-menu-item>
+                            <el-menu-item index="1-2" title="商品列表" href="#shangpin" @click="addTab(proData)">商品列表</el-menu-item>
+
+
+                        </el-submenu>
+                        <el-menu-item index="2">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title" title="订单管理" href="#dingdan" @click="addTab(orderData)">订单管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="3">
+                            <i class="el-icon-document"></i>
+                            <span slot="title" title="客户管理" href="#kehui" @click="addTab(userData)">客户管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="4" disabled>
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">分销商管理</span>
+                        </el-menu-item>
+                    </el-menu>
+
+                </el-aside>
+                <el-main class="main-contaner">
+                    <el-container style="height:100%">
+
+                        <el-main>
+
+
+                            <el-tabs v-model="editableTabsValue2" type="card" closable @tab-remove="removeTab">
+                                <el-tab-pane v-for="(item, index) in editableTabs2"
+                                             :key="item.name"
+                                             :label="item.title"
+                                             :name="item.name" style="height:100%">
+                                    <template style="height:100%">
+                                        
+                                        <iframe v-bind:src="item.content" style="width:100%;height:100%;border:none" ></iframe>
+                                     
+                                    </template>
+
+                                    <template>
+
+                                        <div class="block">
+                                            <el-pagination @size-change="handleSizeChange"
+                                                           @current-change="handleCurrentChange"
+                                                           :current-page="currentPage4"
+                                                           :page-sizes="[100, 200, 300, 400]"
+                                                           :page-size="100"
+                                                           layout="total, sizes, prev, pager, next, jumper"
+                                                           :total="400">
+                                            </el-pagination>
+                                        </div>
+                                    </template>
+                                </el-tab-pane>
+                            </el-tabs>
+                        </el-main>
+                    </el-container>
+                </el-main>
+            </el-container>
+        </el-container>
+
+    </div>
+    <script type="text/javascript" src="../static/js/vue.min.js"></script>
+    <script type="text/javascript" src="../static/js/element.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript">
+
+    var vm= new Vue({
+            el: '#app',
+            data: {
+                nav_tab: true,
+                tableData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1517 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1519 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1516 弄'
+                }],
+                currentPage1: 5,
+                currentPage2: 5,
+                currentPage3: 5,
+                currentPage4: 4,
+                editableTabsValue2: '1',
+                editableTabs2: [{
+                    title: '商品列表',
+                    name: '1',
+                    content: location.origin + "/products?page=product_list"
+                }],
+                tabIndex: 1,
+                isCollapse: false,
+                proData: {
+                    title: "商品列表",
+                    href: location.origin + "/products?page=product_list"
+                },
+                userData: {
+                    title: "客户管理",
+                    href: location.origin + "/user?page=user_list"
+                },
+                orderData: {
+                    title: "订单管理",
+                    href: location.origin + "/order?page=order_list"
+                },
+                proTypeData: {
+                    title: "分类列表",
+                    href: location.origin + "/products?page=product_type_list"
+                },
+                user:""
+            },
+            methods: {
+                formatter(row, column) {
+                    return row.address;
+                },
+                handleSizeChange(val) {
+                    console.log(`每页 ${val} 条`);
+                },
+                handleCurrentChange(val) {
+                    console.log(`当前页: ${val}`);
+                },
+                addTab(obj) {
+                    for (var i = 0; i < this.editableTabs2.length; i++) {
+                        if (obj.title == this.editableTabs2[i].title) {
+                            this.editableTabsValue2 = this.editableTabs2[i].name;
+                           
+                            return
+                        }
+                    }
+                    let newTabName = ++this.tabIndex + '';
+                    this.editableTabs2.push({
+                        title: obj.title,
+                        name: newTabName,
+                        content: obj.href
+                    });
+                    this.editableTabsValue2 = newTabName;
+                   
+                },
+                removeTab(targetName) {
+                    if (targetName == "1") {
+                        return
+                    }
+                    let tabs = this.editableTabs2;
+                    let activeName = this.editableTabsValue2;
+                    if (activeName === targetName) {
+                        tabs.forEach((tab, index) => {
+                            if (tab.name === targetName) {
+                                let nextTab = tabs[index + 1] || tabs[index - 1];
+                                if (nextTab) {
+                                    activeName = nextTab.name;
+                                }
+                            }
+                        });
+                    }
+
+                    this.editableTabsValue2 = activeName;
+                    this.editableTabs2 = tabs.filter(tab => tab.name !== targetName);
+                },
+                handleOpen(key, keyPath) {
+                    console.log(key, keyPath);
+                },
+                handleClose(key, keyPath) {
+                    console.log(key, keyPath);
+                },
+                loginOut() {
+                    $.ajax({
+                        url: location.origin + "/user",
+                        data: {
+                            page: 'logout'
+                        },
+                        type: "get",
+                        dataType: "json",
+                        success: function (e) {
+
+                            if (e.status == "200") {
+                                //var e = confirm("添加成功是否重新加载")
+                                location.reload()
+                            } else if (e.status == "400") {
+                                alert(e.msg)
+                            }
+                        },
+                        complete: function (e) {
+                            // $("body").loader("hide")
+                            //this.fullscreenLoading = false
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                        },
+                    });
+                }
+            }
+
+        })
+
+        //获取用户
+        getLoginUser()
+        function getLoginUser() {
+            $.ajax({
+                url: location.origin + "/user",
+                data: {                  
+                    page:'login'
+                },
+                type: "get",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        //var e = confirm("添加成功是否重新加载")
+                      vm.user=e.user
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    // $("body").loader("hide")
+                    //this.fullscreenLoading = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+    </script>
+</body>
+</html>

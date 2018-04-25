@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加合作商</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/summernote.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/font-awesome.min.css">
+    <link href="../static/css/ssi-uploader.css" rel="stylesheet" />
+    <style>
+        .note-editable {
+            border:1px solid #f5f5f5;
+            border-top:none
+        }
+    </style>
+</head>
+
+
+<body style="margin:0;box-sizing:border-box">
+    <ol class="breadcrumb" style="position:fixed;top:0;width:100vw">
+        <li><a href="partner?page=partner_list">合作商列表</a></li>
+
+        <li class="active">合作商添加</li>
+    </ol>
+
+    <div class="container" style="max-width:750px;margin-top:40px">
+        <input type="hidden" id="attr_id" />
+        <div class="form-group">
+            <input type="text" id="attr_partnerName" required class="form-control" placeholder="合作商名称" />
+        </div>
+        <div class="form-group">
+            <input id="attr_address" class="form-control" placeholder="合作商地址" />
+            
+        </div>
+        <div class="form-group">
+            <input id="attr_position" class="form-control" readonly placeholder="点位置" />
+            <div class="row" style="padding:1em" >
+                <div id="mapContainer" style="height:300px;width:100%"></div>
+
+            </div>
+
+
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-6"><input id="attr_count" required type="number" class="form-control" placeholder="排序值小的靠前" /></div>
+               
+            </div>
+
+
+        </div>       
+
+        <p>详情描述</p>
+        <div id="attr_desc" class="form-control">
+        </div>
+
+    </div>
+    <div class="form-group text-center" style="position:fixed;bottom:0;width:100vw">
+        <button class="btn btn-info" onclick="submitProduct()">保存</button>
+    </div>
+    <script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/js/summernote.min.js"></script>
+    <script type="text/javascript" src="../static/js/summernote-zh-CN.js"></script>
+    <script type="text/javascript" src="../static/js/summernote-zh-CN.js"></script>
+    <script type="text/javascript" src="../static/js/ssi-uploader.js"></script>
+    <script type="text/javascript" src="../static/js/center-loader.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=fcqkPdmifGeV0r2glUSVhu7bcro80quX"></script>
+    <script type="text/javascript">
+        $("#attr_desc").summernote({ lang: "zh-CN", height: 400 });
+        $('#ssi-upload').ssi_uploader({
+            url: 'url',
+            data: { Folder: "Upload\\Tmp" },
+            locale: "ch",
+            allowed: ['jpg', 'jpeg', 'png', 'bmp', 'gif'],
+            dropZone: false
+        });
+
+        function submitProduct() {
+
+            $('input[required]').each(function () {
+                if ($(this).val().trim() == "") {
+
+                    alert($(this).attr('placeholder'))
+                    $(this).focus();
+                    return
+                }
+
+            });
+            $('body').loader("show", $('<i class="fa fa-2x fa-spinner fa-spin"></i>'))
+            $.ajax({
+                url: location.origin + "/partner",
+                data: {
+                    //types: 1,
+                    options: 1,
+                    partnerName: encodeURIComponent($("#attr_partnerName").val()),
+                    address: encodeURIComponent($("#attr_address").val()),
+                    position: encodeURIComponent($("#attr_position").val()),
+                    desc: encodeURIComponent($("#attr_desc").code()),
+                    sortId: $("#attr_sortId").val()
+
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        var e = confirm("添加成功是否重新加载")
+                        if (e == true) {
+                            location.reload()
+                        }
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+    </script>
+    <script>
+        var map = new BMap.Map("mapContainer");
+        var myGeo = new BMap.Geocoder();//地址解释
+        var mk;//覆盖物
+        //实例化一个地图对象
+        //var point = new BMap.Point(116.331398, 39.897445); //设置地图中心的位置
+        // map.centerAndZoom(point, 18); //设置地图元素的可视层
+        map.enableScrollWheelZoom();
+        //启用滚轮放大缩小，默认禁用
+        map.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用
+        function myFun(result) {
+            var cityName = result.name;
+            map.setCenter(cityName);
+        }
+
+        var myCity = new BMap.LocalCity();
+        myCity.get(myFun);
+        /////////////////////////////////////
+        var geolocation = new BMap.Geolocation();
+        var point;
+        // 开启SDK辅助定位
+        geolocation.enableSDKLocation();
+        geolocation.getCurrentPosition(function (r) {//获取当前位置
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                point = r.point
+                map.centerAndZoom(r.point, 18);
+                mk = new BMap.Marker(r.point);
+                mk.enableDragging();
+                map.addOverlay(mk);
+                map.panTo(r.point);
+                ////////
+                var gc = new BMap.Geocoder();
+                //获取地址的数据地址
+                var pt = r.point;
+                gc.getLocation(pt, function (rs) {
+                    var addComp = rs.addressComponents;
+                    address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                    //alert(address)
+                    $("#attr_address").val(address)
+                    $("#attr_position").val(JSON.stringify(pt))
+                    //画图
+                    // label = new BMap.Label(address, { offset: new BMap.Size(20, -10) });
+                    //mk.setLabel(label);
+                });
+                //////////
+                mk.addEventListener("dragend", function (m_rs) {
+                    var pt = m_rs.point;
+                    map.centerAndZoom(pt, 18);
+                    //map.addOverlay(new BMap.Marker(pt));
+                    gc.getLocation(pt, function (rs) {
+                        var addComp = rs.addressComponents;
+                        address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                        //画图
+                        //label.setContent(address)
+                        //mk.setLabel(label);
+                        $("#attr_address").val(address)
+                        $("#attr_position").val(JSON.stringify(pt))
+                    });
+                })
+            } else {
+                alert('failed' + this.getStatus());
+            }
+        }, {
+                enableHighAccuracy: true
+            })
+        $('#attr_address').change(function () {
+            // 将地址解析结果显示在地图上,并调整地图视野
+            myGeo.getPoint(this.value, function (point) {
+                if (point) {
+                   // map.centerAndZoom(point, 18);
+                    map.clearOverlays(); 
+                    mk = new BMap.Marker(point)
+                    mk.enableDragging();
+                    map.addOverlay(mk);
+                    $("#attr_position").val(JSON.stringify(point))
+
+                    mk.addEventListener("dragend", function (m_rs) {
+                        var pt = m_rs.point;
+                        map.centerAndZoom(pt, 18);
+                        //map.addOverlay(new BMap.Marker(pt));
+                        myGeo.getLocation(pt, function (rs) {
+                            var addComp = rs.addressComponents;
+                            address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                            //画图
+                            //label.setContent(address)
+                            //mk.setLabel(label);
+                            $("#attr_address").val(address)
+                            $("#attr_position").val(JSON.stringify(pt))
+                        });
+                    })
+                    //map.panTo(point);
+                } else {
+                    alert("您选择地址没有解析到结果!");
+                }
+            }, "广州市");
+        })              
+    </script>
+</body>
+</html>

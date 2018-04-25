@@ -1,7 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
+	"fmt"
+	//"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -14,6 +15,8 @@ type TProduct struct {
 	UserId int64
 	//产品分类
 	ProductTypeId int64
+	//产品分类
+	PartnerId int64
 	//产品名称
 	Name string
 	//库存量
@@ -42,26 +45,36 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	products := make([]*TProduct, 0)
 	o := orm.NewOrm()
 	var sql string
-	var num int64
+	//var num int64
 	var err error
 	if where != "" {
 		sql = "select * from t_product where product_type_id = ? and ? order by id desc limit ? offset ?"
 		_, err = o.Raw(sql, productTypeId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
 
 	} else {
-		sql = "select * from t_product where product_type_id = ? order by id desc limit ? offset ?"
-		_, err = o.Raw(sql, productTypeId, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
+		sql = fmt.Sprintf("select * from t_product where product_type_id = %v order by id desc limit %v offset %v", productTypeId, pageSize, pageSize*(pageNo-1))
+		if productTypeId == 0 {
+			sql = fmt.Sprintf("select * from t_product order by id desc limit %v offset %v", pageSize, pageSize*(pageNo-1))
+
+		}
+		_, err = o.Raw(sql).QueryRows(&products)
 	}
 	products1 := make([]*TProduct, 0)
-	totalNum, _ := o.Raw("select * from t_product where product_type_id = ? ", productTypeId).QueryRows(&products1)
-	beego.Info(products1)
-	beego.Info(where)
-	beego.Info(num)
-	beego.Info(totalNum)
-	mTotalNum := int(totalNum)
-	totalPage := mTotalNum/pageSize + 1
-	beego.Info(products)
-	return products, totalPage, err
+	sqlCount := fmt.Sprintf("select * from t_product where product_type_id = %v ", productTypeId)
+	if productTypeId == 0 {
+		sqlCount = "select * from t_product"
+
+	}
+	totalNum, _ := o.Raw(sqlCount).QueryRows(&products1)
+	//beego.Info(sql)
+	// beego.Info(products1)
+	// beego.Info(where)
+	// beego.Info(num)
+	// beego.Info(totalNum)
+	// mTotalNum := int(totalNum)
+	// totalPage := mTotalNum/pageSize + 1
+	// beego.Info(products)
+	return products, int(totalNum), err
 }
 
 func AddProduct(productTypeId int64, userId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {

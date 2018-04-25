@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/astaxie/beego"
+
 	"github.com/astaxie/beego/orm"
 	"os"
 	"shop/models"
@@ -19,6 +20,9 @@ func main() {
 	//创建附件目录
 	os.Mkdir("pictures", os.ModePerm)
 	beego.SetStaticPath("pictures", "pictures")
-
+	beego.BConfig.WebConfig.Session.SessionOn = true
+	beego.BConfig.WebConfig.TemplateLeft = "[["
+	beego.BConfig.WebConfig.TemplateRight = "]]"
 	beego.Run()
+
 }

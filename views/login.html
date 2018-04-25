@@ -1,14 +1,132 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>登录测试</title>
+    <title>Epr首页管理</title>
+
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" type="text/css" href="../static/css/element.css">
+    <link href="../static/css/base.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/login.css" rel="stylesheet" type="text/css">
+    <style>
+        .el-header, .el-footer {
+            background-color: #B3C0D1;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-aside {
+            background-color: #D3DCE6;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-main {
+            background-color: #ffffff;
+            color: #333;
+            text-align: center;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+        /*---------*/
+        .main-contaner {
+            padding: 0;
+        }
+
+        .nav-tab {
+            background-color: #E9EEF3;
+        }
+    </style>
 </head>
+
+
 <body>
-	<form action="/login " method="POST">
-		<label>登录</label>
-		<div>手机号:<input type="text" name="tel"></div>
-		<div>密码:<input type="text" name="pwd"></div>
-		<input type="submit" name="获取相片"Submit/>
-	</form>	
+
+    <div id="app">
+        <!--<el-container>
+      <el-main>
+          <div style="max-width:400px;top:40%;margin-left:auto;margin-right:auto">
+              <el-input placeholder="请输入用户名"
+                        clearable>
+              </el-input>
+              <el-input class="text_value" placeholder="请输入密码"
+                        clearable>
+              </el-input>
+              <el-button>登陆</el-button>
+          </div>
+      </el-main>
+    </el-container>-->
+        <form action="" method="post" id="form">
+            <div class="logo"></div>
+            <div class="login_form">
+                <div class="user">
+                    <el-input class="text_value" placeholder="请输入手机号"
+                         v-model="attr_tel"     clearable>
+                    </el-input>
+                    <el-input class="text_value" placeholder="请输入密码"
+                        v-model="attr_password"       clearable>
+                    </el-input>
+                </div>
+                <button class="button" id="submit" type="button"  @click="submitData()">登录</button>
+            </div>
+
+            <div id="tip"></div>
+            <div class="foot">
+                Copyright © 2011-2015  All Rights
+            </div>
+        </form>
+
+    </div>
+<script type="text/javascript" src="../static/js/vue.min.js"></script>
+<script type="text/javascript" src="../static/js/element.min.js"></script>
+<script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+   
+	var vm= new Vue({
+         el: '#app',
+         data: {
+             attr_tel: "",
+             attr_password: "",
+            // fullscreenLoading: false
+         },
+         methods: {
+             submitData() {
+                // this.fullscreenLoading = true;
+                 $.ajax({
+                     url: location.origin + "/login",
+                     data: {
+                         pwd: this.attr_password,
+                         tel: this.attr_tel
+
+                     },
+                     type: "post",
+                     dataType: "json",
+                     success: function (e) {
+
+                         if (e.status == "200") {
+                             //var e = confirm("添加成功是否重新加载")
+                             location.href=location.origin + "/login?page=index"
+                         } else if (e.status == "400") {
+                             alert(e.msg)
+                         }
+                     },
+                     complete: function (e) {
+                         // $("body").loader("hide")
+                         //this.fullscreenLoading = false
+                     },
+                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                         alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                     },
+                 });
+             }
+         }
+         
+         
+    })
+    
+  
+</script>
 </body>
 </html>

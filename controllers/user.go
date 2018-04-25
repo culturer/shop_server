@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"shop/models"
 	"strconv"
@@ -12,9 +13,34 @@ type UserController struct {
 }
 
 func (this *UserController) Get() {
-	this.Data["Website"] = "beego.me"
-	this.Data["Email"] = "astaxie@gmail.com"
-	this.TplName = "index.tpl"
+	// this.Data["Website"] = "beego.me"
+	// this.Data["Email"] = "astaxie@gmail.com"
+	// this.TplName = "index.tpl"
+	var page string
+	this.Ctx.Input.Bind(&page, "page")
+	if page == "user_list" {
+		this.TplName = "user_list.html"
+	} else if page == "logout" {
+		this.DelSession("uid")
+		beego.Info(fmt.Sprintf("logout,uid:%v", this.GetSession("uid")))
+		this.Data["json"] = map[string]interface{}{"status": 200, "user": 0, "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+		//this.Redirect(302, "log")
+	} else if page == "login" {
+		//var userId int64
+		userId, _ := this.GetSession("uid").(int64)
+		user, err := this.getUserById(userId)
+		if err != nil {
+			beego.Info(userId)
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 查询用户异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		this.Data["json"] = map[string]interface{}{"status": 200, "user": user, "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
 }
 
 func (this *UserController) Post() {
@@ -53,6 +79,25 @@ func (this *UserController) Post() {
 			this.Data["json"] = map[string]interface{}{"status": 200, "user": user, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
+
+		}
+		if getType == 2 {
+			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
+			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+
+			users, totalPage, err := this.getUserPage(pageNo, pageSize, "")
+
+			if err != nil {
+				beego.Info(err.Error())
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取用户列表失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+
+			this.Data["json"] = map[string]interface{}{"status": 200, "users": users, "totalPage": totalPage, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+
 		}
 
 	}
@@ -60,7 +105,8 @@ func (this *UserController) Post() {
 	if options == 1 {
 		tel := this.Input().Get("tel")
 		password := this.Input().Get("password")
-		userId, err := this.addUser(tel, password)
+		name := this.Input().Get("Name")
+		userId, err := this.addUser(tel, password, name)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 新增用户异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -74,6 +120,12 @@ func (this *UserController) Post() {
 
 	if options == 2 {
 		userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
+
+		if id := this.GetSession("uid"); userId == id {
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 不能删除自己！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
 		err := this.delUser(userId)
 		if err != nil {
 			beego.Info(err.Error())
@@ -168,8 +220,8 @@ func (this *UserController) getUserByTel(tel string) (*models.TUser, error) {
 }
 
 //新建用户
-func (this *UserController) addUser(tel string, password string) (int64, error) {
-	userId, err := models.AddUser(tel, password)
+func (this *UserController) addUser(tel string, password, name string) (int64, error) {
+	userId, err := models.AddUser(tel, password, name)
 	return userId, err
 }
 
@@ -201,4 +253,10 @@ func (this *UserController) mdfyVid(userId int64, vid string) error {
 func (this *UserController) mdfyProv(userId int64, prov int) error {
 	err := models.MdfyProv(userId, prov)
 	return err
+}
+
+//分页查询用户
+func (this *UserController) getUserPage(pageNo, pageSize int, where string) ([]*models.TUser, int, error) {
+	users, totalPage, err := models.GetUserPage(pageNo, pageSize, where)
+	return users, totalPage, err
 }

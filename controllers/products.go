@@ -18,6 +18,10 @@ func (this *ProductController) Get() {
 		this.TplName = "product_add.html"
 	} else if page == "product_list" {
 		this.TplName = "product_list.html"
+	} else if page == "product_type_list" {
+		this.TplName = "product_type_list.html"
+	} else if page == "product_edit" {
+		this.TplName = "product_edit.html"
 	}
 }
 
@@ -38,11 +42,11 @@ func (this *ProductController) Post() {
 
 		if options == 0 {
 
-			partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
+			//partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
 			pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
 			pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
 
-			productTypes, totalPage, err := this.getProductTypes(partnerId, pageNo, pageSize, "")
+			productTypes, totalPage, err := this.getProductTypes(pageNo, pageSize, "")
 
 			if err != nil {
 				beego.Info(err.Error())
@@ -58,9 +62,9 @@ func (this *ProductController) Post() {
 		}
 
 		if options == 1 {
-			partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
+			sortId, _ := strconv.ParseInt(this.Input().Get("sortId"), 10, 64)
 			typeName := this.Input().Get("typeName")
-			productTypeId, err := this.addProductType(typeName, partnerId)
+			productTypeId, err := this.addProductType(typeName, sortId)
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 添加商品分类失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -106,7 +110,7 @@ func (this *ProductController) Post() {
 			}
 
 			if mdfyType == 1 {
-				sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+				sortId, _ := strconv.ParseInt(this.Input().Get("sortId"), 10, 64)
 				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
 				err := models.MdfyProductTypeSortId(productTypeId, sortId)
 				if err != nil {
@@ -340,13 +344,13 @@ func (this *ProductController) Post() {
 	return
 }
 
-func (this *ProductController) getProductTypes(partnerId int64, pageNo, pageSize int, where string) ([]*models.TProductType, int, error) {
-	productTypes, totalPage, err := models.GetProductTypeByPartnerId(partnerId, pageNo, pageSize, where)
+func (this *ProductController) getProductTypes(pageNo, pageSize int, where string) ([]*models.TProductType, int, error) {
+	productTypes, totalPage, err := models.GetProductTypePage(pageNo, pageSize, where)
 	return productTypes, totalPage, err
 }
 
-func (this *ProductController) addProductType(typeName string, partnerId int64) (int64, error) {
-	productTypeId, err := models.AddProductType(typeName, partnerId)
+func (this *ProductController) addProductType(typeName string, sortId int64) (int64, error) {
+	productTypeId, err := models.AddProductType(typeName, sortId)
 	return productTypeId, err
 }
 
@@ -355,8 +359,8 @@ func (this *ProductController) delProductType(productTypeId int64) error {
 	return err
 }
 
-func (this *ProductController) mdfyProductTypePartner(productTypeId int64, partnerId int64) error {
-	err := models.MdfyPartner(productTypeId, partnerId)
+func (this *ProductController) mdfyProductTypePartner(productTypeId int64, sortId int64) error {
+	err := models.MdfyPartner(productTypeId, sortId)
 	return err
 }
 

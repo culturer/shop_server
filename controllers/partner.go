@@ -12,7 +12,13 @@ type PartnerController struct {
 }
 
 func (this *PartnerController) Get() {
-	this.TplName = "login.html"
+	var page string
+	this.Ctx.Input.Bind(&page, "page")
+	if page == "partner_add" {
+		this.TplName = "partner_add.html"
+	} else if page == "partner_list" {
+		this.TplName = "partner_list.html"
+	}
 }
 
 func (this *PartnerController) Post() {
@@ -63,10 +69,13 @@ func (this *PartnerController) Post() {
 	}
 
 	if options == 1 {
-		userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
-		addressId, _ := strconv.ParseInt(this.Input().Get("addressId"), 10, 64)
+		var userId int64
+		userId, _ = (this.GetSession("uid")).(int64)
+		address := this.Input().Get("address")
 		partnerName := this.Input().Get("partnerName")
-		partnerId, err := this.addPartner(userId, partnerName, addressId)
+		position := this.Input().Get("position")
+		desc := this.Input().Get("desc")
+		partnerId, err := this.addPartner(userId, partnerName, address, position, desc)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 添加分销商异常，请检查后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -121,8 +130,8 @@ func (this *PartnerController) Post() {
 
 		if mdfyType == 1 {
 			partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
-			addressId, _ := strconv.ParseInt(this.Input().Get("addressId"), 10, 64)
-			err := this.mdfyPartnerAddress(partnerId, addressId)
+			address := this.Input().Get("address")
+			err := this.mdfyPartnerAddress(partnerId, address)
 			if err != nil {
 				beego.Info(err.Error())
 				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改分销商地址异常，请检查后再试！", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -185,8 +194,8 @@ func (this *PartnerController) Post() {
 
 }
 
-func (this *PartnerController) addPartner(userId int64, partnerName string, addressId int64) (int64, error) {
-	partnerId, err := models.AddPartner(userId, partnerName, addressId)
+func (this *PartnerController) addPartner(userId int64, partnerName string, address, position, desc string) (int64, error) {
+	partnerId, err := models.AddPartner(userId, partnerName, address, position, desc)
 	return partnerId, err
 }
 
@@ -210,8 +219,8 @@ func (this *PartnerController) mdfyPartnerName(partnerId int64, partnerName stri
 	return err
 }
 
-func (this *PartnerController) mdfyPartnerAddress(partnerId int64, addressId int64) error {
-	err := models.MdfyPartnerAddress(partnerId, addressId)
+func (this *PartnerController) mdfyPartnerAddress(partnerId int64, address string) error {
+	err := models.MdfyPartnerAddress(partnerId, address)
 	return err
 }
 
