@@ -37,11 +37,14 @@ func GetProductTypePage(pageNo, pageSize int, where string) ([]*TProductType, in
 	var err error
 	if where != "" {
 
-		sql = fmt.Sprintf("select * from t_product_type where  %v order by sort_id desc limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
+		sql = fmt.Sprintf("select * from t_product_type where  %v order by sort_id  limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
 		_, err = o.Raw(sql).QueryRows(&productTypes)
 
 	} else {
-		sql = fmt.Sprintf("select * from t_product_type  order by sort_id desc limit %v offset %v", pageSize, pageSize*(pageNo-1))
+		sql = fmt.Sprintf("select * from t_product_type  order by sort_id  limit %v offset %v", pageSize, pageSize*(pageNo-1))
+		if pageSize == 0 {
+			sql = "select * from t_product_type  order by sort_id "
+		}
 		_, err = o.Raw(sql).QueryRows(&productTypes)
 	}
 	productTypes1 := make([]*TProductType, 0)

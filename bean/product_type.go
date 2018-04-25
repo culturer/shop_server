@@ -7,7 +7,7 @@ import (
 type ProductTypeBean struct {
 	ProductType  *models.TProductType
 	ProductBeans []*ProductBean
-	Partner      *PartnerBean
+	//Partner      *PartnerBean
 }
 
 func GetProductTypeBean(productTypeId int64) (*ProductTypeBean, error) {
@@ -23,10 +23,10 @@ func GetProductTypeBean(productTypeId int64) (*ProductTypeBean, error) {
 			return nil, err
 		}
 	}
-	partner, err := GetPartnerBean(productType.SortId)
-	if err != nil {
-		return nil, err
-	}
-	productTypeBean := &ProductTypeBean{ProductType: productType, ProductBeans: products, Partner: partner}
+	// partner, err := GetPartnerBean(productType.SortId)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	productTypeBean := &ProductTypeBean{ProductType: productType, ProductBeans: products}
 	return productTypeBean, err
 }

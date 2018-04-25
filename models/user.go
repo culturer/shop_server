@@ -3,6 +3,8 @@ package models
 import (
 	"github.com/astaxie/beego/orm"
 	// _ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"time"
 )
 
 //用户
@@ -18,6 +20,8 @@ type TUser struct {
 	Vid string
 	//权限
 	Prov int
+	//添加时间
+	CreateTime string
 }
 
 //查询账号
@@ -39,9 +43,9 @@ func GetUserByTel(tel string) (*TUser, error) {
 }
 
 //新建用户
-func AddUser(tel string, password string) (int64, error) {
+func AddUser(tel string, password, name string) (int64, error) {
 	o := orm.NewOrm()
-	user := &TUser{Password: password, Tel: tel, Prov: 0}
+	user := &TUser{Password: password, Tel: tel, Prov: 0, Name: name, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
 	userId, err := o.Insert(user)
 	return userId, err
 }
@@ -100,4 +104,37 @@ func MdfyProv(userId int64, prov int) error {
 	o := orm.NewOrm()
 	_, err = o.Update(user)
 	return err
+}
+
+//分页获取用户列表
+func GetUserPage(pageNo, pageSize int, where string) ([]*TUser, int, error) {
+	users := make([]*TUser, 0)
+	o := orm.NewOrm()
+	var sql string
+	var sqlCount string
+	//var num int64
+	var err error
+	if where != "" {
+		sqlCount = "select * from t_user where " + where
+		sql = fmt.Sprintf("select * from t_user where  %v order by id  limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
+		_, err = o.Raw(sql).QueryRows(&users)
+
+	} else {
+		sql = fmt.Sprintf("select * from t_user  order by id  limit %v offset %v", pageSize, pageSize*(pageNo-1))
+		if pageSize == 0 {
+			sql = "select * from t_user  order by id "
+			sqlCount = "select * from t_user "
+		}
+		_, err = o.Raw(sql).QueryRows(&users)
+	}
+	users1 := make([]*TUser, 0)
+	totalNum, _ := o.Raw(sqlCount).QueryRows(&users1)
+	// beego.Info(productTypes1)
+	// beego.Info(where)
+	// beego.Info(num)
+	// beego.Info(totalNum)
+	mTotalNum := int(totalNum)
+	// totalPage := mTotalNum
+	// beego.Info(productTypes)
+	return users, mTotalNum, err
 }

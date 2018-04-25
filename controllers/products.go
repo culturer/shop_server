@@ -20,6 +20,8 @@ func (this *ProductController) Get() {
 		this.TplName = "product_list.html"
 	} else if page == "product_type_list" {
 		this.TplName = "product_type_list.html"
+	} else if page == "product_edit" {
+		this.TplName = "product_edit.html"
 	}
 }
 

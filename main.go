@@ -21,6 +21,8 @@ func main() {
 	os.Mkdir("pictures", os.ModePerm)
 	beego.SetStaticPath("pictures", "pictures")
 	beego.BConfig.WebConfig.Session.SessionOn = true
+	beego.BConfig.WebConfig.TemplateLeft = "[["
+	beego.BConfig.WebConfig.TemplateRight = "]]"
 	beego.Run()
 
 }

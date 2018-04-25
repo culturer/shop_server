@@ -53,11 +53,20 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 
 	} else {
 		sql = fmt.Sprintf("select * from t_product where product_type_id = %v order by id desc limit %v offset %v", productTypeId, pageSize, pageSize*(pageNo-1))
+		if productTypeId == 0 {
+			sql = fmt.Sprintf("select * from t_product order by id desc limit %v offset %v", pageSize, pageSize*(pageNo-1))
+
+		}
 		_, err = o.Raw(sql).QueryRows(&products)
 	}
 	products1 := make([]*TProduct, 0)
-	totalNum, _ := o.Raw("select * from t_product where product_type_id = ? ", productTypeId).QueryRows(&products1)
-	// beego.Info(sql)
+	sqlCount := fmt.Sprintf("select * from t_product where product_type_id = %v ", productTypeId)
+	if productTypeId == 0 {
+		sqlCount = "select * from t_product"
+
+	}
+	totalNum, _ := o.Raw(sqlCount).QueryRows(&products1)
+	//beego.Info(sql)
 	// beego.Info(products1)
 	// beego.Info(where)
 	// beego.Info(num)

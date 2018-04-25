@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"shop/models"
 	"time"
@@ -11,7 +12,14 @@ type LoginController struct {
 }
 
 func (this *LoginController) Get() {
-	this.TplName = "login.html"
+	var page string
+	this.Ctx.Input.Bind(&page, "page")
+	if page == "index" {
+		this.TplName = "index.html"
+	} else {
+		this.TplName = "login.html"
+	}
+
 }
 
 func (this *LoginController) Post() {
@@ -31,7 +39,17 @@ func (this *LoginController) Post() {
 	}
 
 	if user != nil && user.Password == pwd {
-		this.SetSession("uid", int(1))
+		//this.SetSession("uid", int(64))
+		uid := this.GetSession("uid")
+		if uid == nil {
+			//this.SetSession("uid", int(1))
+			this.SetSession("uid", user.Id)
+
+			beego.Info(fmt.Sprintf("uid:%v", this.GetSession("uid"))) //this.Data["num"] = 0
+		} else {
+			this.SetSession("uid", user.Id)
+			//this.Data["num"] = v.(int)
+		}
 		this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
 		return

@@ -69,7 +69,7 @@
                         v-model="attr_password"       clearable>
                     </el-input>
                 </div>
-                <button class="button" id="submit" type="button"  v-loading.fullscreen.lock="fullscreenLoading"@click="submitData()">登录</button>
+                <button class="button" id="submit" type="button"  @click="submitData()">登录</button>
             </div>
 
             <div id="tip"></div>
@@ -89,11 +89,11 @@
          data: {
              attr_tel: "",
              attr_password: "",
-             fullscreenLoading: false
+            // fullscreenLoading: false
          },
          methods: {
              submitData() {
-                 this.fullscreenLoading = true;
+                // this.fullscreenLoading = true;
                  $.ajax({
                      url: location.origin + "/login",
                      data: {
@@ -107,14 +107,14 @@
 
                          if (e.status == "200") {
                              //var e = confirm("添加成功是否重新加载")
-                             alert(JSON.stringify(e))
+                             location.href=location.origin + "/login?page=index"
                          } else if (e.status == "400") {
                              alert(e.msg)
                          }
                      },
                      complete: function (e) {
                          // $("body").loader("hide")
-                         this.fullscreenLoading = false
+                         //this.fullscreenLoading = false
                      },
                      error: function (XMLHttpRequest, textStatus, errorThrown) {
                          alert("状态：" + textStatus + "；出错提示：" + errorThrown);

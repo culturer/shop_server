@@ -247,6 +247,44 @@
                 },
             });
         }
+        bindData()
+        //绑定数据
+        function bindData() {
+            $.ajax({
+                url: location.origin + "/get",
+                data: {
+                    //types: 0,
+                    options: 3,
+                    productId: getQueryString("productId"),
+                    //getType: 0,
+                    //pageNo: 1,
+                    //pageSize: 0
+
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        console.log(e)
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //获取url参数
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
     </script>
 </body>
 </html>
