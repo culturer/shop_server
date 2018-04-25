@@ -19,5 +19,6 @@ func main() {
 	//创建附件目录
 	os.Mkdir("pictures", os.ModePerm)
 	beego.SetStaticPath("pictures", "pictures")
+
 	beego.Run()
 }

@@ -24,4 +24,5 @@ func init() {
 	beego.Router("/address", &controllers.AddressController{})
 	//获取信息接口
 	beego.Router("/get", &controllers.GetController{})
+	beego.Router("/test", &controllers.TestController{})
 }

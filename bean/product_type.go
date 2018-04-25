@@ -15,7 +15,7 @@ func GetProductTypeBean(productTypeId int64) (*ProductTypeBean, error) {
 	if err != nil {
 		return nil, err
 	}
-	mProducts, _, err := models.GetProductByType(productTypeId, 100, 100, "")
+	mProducts, _, err := models.GetProductByType(productTypeId, 0, 100, "")
 	products := make([]*ProductBean, len(mProducts))
 	for i := 0; i < len(mProducts); i++ {
 		products[i], err = GetProductBean(mProducts[i].Id)

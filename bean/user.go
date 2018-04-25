@@ -15,11 +15,11 @@ func GetUserBean(userId int64) (*UserBean, error) {
 	if err != nil {
 		return nil, err
 	}
-	address, _, err := models.GetAddressByUserId(userId, 100, 100, "")
+	address, _, err := models.GetAddressByUserId(userId, 0, 100, "")
 	if err != nil {
 		return nil, err
 	}
-	mOrders, _, err := models.GetOrderByUserId(userId, 100, 100, "")
+	mOrders, _, err := models.GetOrderByUserId(userId, 0, 100, "")
 	orders := make([]*OrderBean, len(mOrders))
 	for i := 0; i < len(mOrders); i++ {
 		orders[i], err = GetOrderBean(mOrders[i].Id)

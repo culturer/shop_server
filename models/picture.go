@@ -5,7 +5,7 @@ import (
 	// _ "github.com/go-sql-driver/mysql"
 )
 
-//产品分类
+//产品图片
 type TPicture struct {
 	Id int64
 	//产品Id

@@ -17,7 +17,7 @@ func GetOrderBean(orderId int64) (*OrderBean, error) {
 		return nil, err
 	}
 
-	mOrderItems, _, err := models.GetOrderItemByOrderId(orderId, 100, 100, "")
+	mOrderItems, _, err := models.GetOrderItemByOrderId(orderId, 0, 100, "")
 	if err != nil {
 		return nil, err
 	}
