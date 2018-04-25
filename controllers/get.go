@@ -13,7 +13,7 @@ type GetController struct {
 
 func (this *GetController) Get() {
 	// this.Data["Email"] = "astaxie@gmail.com"
-	this.TplName = "order.html"
+	this.TplName = "get_test.html"
 }
 
 func (this *GetController) Post() {

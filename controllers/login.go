@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"shop/models"
+	"strconv"
 	"time"
 )
 
@@ -23,6 +24,10 @@ func (this *LoginController) Get() {
 }
 
 func (this *LoginController) Post() {
+
+	// [options == 0  客户登录]
+	// [options == 1  管理员登录]
+	options, _ := strconv.Atoi(this.Input().Get("options"))
 
 	//获取数据信息
 	pwd := this.Input().Get("pwd")
@@ -50,6 +55,19 @@ func (this *LoginController) Post() {
 			this.SetSession("uid", user.Id)
 			//this.Data["num"] = v.(int)
 		}
+
+		//判断是否是管理员登录
+		if options == 1 {
+			if user.Prov == 1 {
+				this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，账号或密码错误，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+
 		this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
 		return

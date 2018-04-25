@@ -26,9 +26,10 @@ type TProduct struct {
 	//成本价
 	StandardPrice float64
 	//产品描述
-	Desc string `orm:"size(5000)"`
+	Desc string `orm:"type(text);null"`
 	//产品备注
-	Msg string `orm:"size(2000)"`
+	Msg string `orm:"type(text);null"`
+
 	//创建时间
 	CreateTime string
 }

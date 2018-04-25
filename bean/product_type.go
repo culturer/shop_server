@@ -1,6 +1,7 @@
 package bean
 
 import (
+	"github.com/astaxie/beego"
 	"shop/models"
 )
 
@@ -20,7 +21,8 @@ func GetProductTypeBean(productTypeId int64) (*ProductTypeBean, error) {
 	for i := 0; i < len(mProducts); i++ {
 		products[i], err = GetProductBean(mProducts[i].Id)
 		if err != nil {
-			return nil, err
+			beego.Info(err)
+			// return nil, err
 		}
 	}
 	// partner, err := GetPartnerBean(productType.SortId)
