@@ -198,18 +198,40 @@ func (this *ProductController) Post() {
 		}
 
 		if options == 2 {
-			productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
-			err := this.delProduct(productId)
-			if err != nil {
-				beego.Info(err.Error())
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 删除商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// [delType == 0  删除产品]
+			// [delType == 1  删除产品图片]
+			delType, _ := strconv.Atoi(this.Input().Get("delType"))
+
+			if delType == 0 {
+
+				productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
+				err := this.delProduct(productId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 删除商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+
+				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 删除商品成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+
+			}
+
+			if delType == 1 {
+				pictureId, _ := strconv.ParseInt(this.Input().Get("pictureId"), 10, 64)
+				err := models.DelPicture(pictureId)
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 删除图片失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 删除图片成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
-			this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 删除商品成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
-
 		}
 
 		if options == 3 {
