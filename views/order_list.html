@@ -54,7 +54,7 @@
 
                         <el-input placeholder="请输入内容" class="input-with-select">
                             <el-select style="width:100px;max-width:200px" v-model="productTypeId" slot="prepend" placeholder="全部">
-                                <el-option label="全部" value="0" >
+                                <el-option label="全部" value="0">
 
                                 </el-option>
                                 <el-option :label="item.TypeName" v-for="item in typeList" :value="item.Id">
@@ -104,7 +104,7 @@
                                          sortable
                                          label="库存">
                         </el-table-column>
-                        <el-table-column prop="CreateTime"
+                        <el-table-column prop="Add_time"
                                          sortable
                                          label="时间">
                         </el-table-column>

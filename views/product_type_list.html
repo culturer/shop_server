@@ -67,7 +67,7 @@
                     <el-col :span="8" style="text-align:right">
                         <el-button @click="toggleSelection()">取消选择</el-button>
                         <el-button type="warning" @click="batchDelete()">移除</el-button>
-                        <el-button type="success" @click="dialogVisible=true">新增</el-button>
+                        <el-button type="success" @click="dialogVisible=true;form.Id=0">新增</el-button>
                     </el-col>
                 </el-row>
 
@@ -107,7 +107,7 @@
                                          sortable
                                          label="操作">
                             <template slot-scope="scope">
-                                <el-button @click.native.prevent="editOne(scope.row.Id)"
+                                <el-button @click.native.prevent="dialogVisible=true;form=scope.row"
                                            type="text"
                                            size="small">
                                     编辑
@@ -151,7 +151,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="addOne()">确 定</el-button>
+                <el-button type="primary" @click="addData(form.Id)">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -172,7 +172,8 @@
                 dialogVisible: false,
                 form: {
                     TypeName: "",
-                    SortId:""
+                    SortId: "",
+                    Id: 0,
                 }
 
             },
@@ -194,6 +195,7 @@
                     }
 
                 },
+             
                 toggleSelection(rows) {
                     if (rows) {
                         rows.forEach(row => {
@@ -223,12 +225,17 @@
                     }
 
                 },
-                addOne(item) {
+                addData(id) {
                     if (this.form.TypeName == "" || this.form.SortId == "") {
                         alert("请填写完整参数")
                         return
                     }
-                    submitData()
+                    if (id!=0) {
+                        editData(id)
+                    } else {
+                        submitData()
+                    }
+                  
                 }
 
 
@@ -259,7 +266,7 @@
                     if (e.status == "200") {
                         var list = e.productTypes;
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)
+                            list[i].TypeName = decodeURIComponent(list[i].TypeName)
                         }
                         vm.tableData = list
                         vm.pageTotal = e.totalPage
@@ -328,8 +335,39 @@
                 data: {
                     types: 0,
                     options: 1,
-                    typeName: decodeURIComponent(vm.form.TypeName),
-                    sortId: vm.form.SortId
+                    TypeName: encodeURIComponent(vm.form.TypeName),
+                    SortId: vm.form.SortId
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        getPageData(1, vm.pageSize);
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    vm.dialogVisible = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //修改数据
+        function editData(id) {
+           
+            $.ajax({
+                url: location.origin + "/products",
+                data: {
+                    types: 0,
+                    options: 3,
+                  
+                    TypeName: decodeURIComponent(vm.form.TypeName),
+                    SortId: vm.form.SortId,
+                    Id:id
                 },
                 type: "post",
                 dataType: "json",

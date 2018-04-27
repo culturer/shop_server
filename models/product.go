@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	//"github.com/astaxie/beego"
+	"errors"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -34,6 +35,8 @@ type TProduct struct {
 	CreateTime string
 }
 
+//-------------------------------基本方法------------------------------------------
+//根据id获取数据实体
 func GetProductById(productId int64) (*TProduct, error) {
 	o := orm.NewOrm()
 	product := new(TProduct)
@@ -42,6 +45,113 @@ func GetProductById(productId int64) (*TProduct, error) {
 	return product, err
 }
 
+//根据sql获取数据实体
+func GetProductBySql(excSql string) (*TProduct, error) {
+
+	o := orm.NewOrm()
+	product := new(TProduct)
+	err := o.Raw(excSql).QueryRow(&product)
+	return product, err
+}
+
+//新增数据实体
+func AddProduct(product *TProduct) (int64, error) {
+	//防止误设置id影响排序
+	product.Id = 0
+	product.CreateTime = time.Now().Format("2006-01-02 15:04:05")
+	o := orm.NewOrm()
+	//product := &TProduct{ProductTypeId: productTypeId, UserId: userId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg, CreateTime: time.Now().Format("2006-01-02 15:04:05"), SortId: 0}
+	pictureId, err := o.Insert(product)
+	return pictureId, err
+}
+
+//删除数据实体
+func DelProduct(productId int64) error {
+
+	o := orm.NewOrm()
+	product := &TProduct{Id: productId}
+	_, err := o.Delete(product)
+	return err
+}
+
+//批量删除数据
+func DelProducts(ids string) (bool, error) {
+
+	result := true
+	sql := fmt.Sprintf("delete * from t_product id in(%v)", ids)
+	o := orm.NewOrm()
+	res, err := o.Raw(sql).Exec()
+	if err == nil {
+		result = false
+		num, _ := res.RowsAffected()
+		fmt.Println("mysql row affected nums: ", num)
+	}
+	return result, err
+}
+
+//修改数据实体
+func EditProduct(product *TProduct) (int, error) {
+	if product.Id == 0 {
+		return 0, errors.New("id is require")
+	}
+	//orm模块
+	ormHelper := orm.NewOrm()
+
+	//错误对象
+	num, err := ormHelper.Update(product)
+	if err != nil {
+		fmt.Printf("error is %v\n", err)
+	}
+	//fmt.Printf("num is %v,data is %v\n", num, data)
+	return int(num), err
+}
+
+//分页获取数据
+func GetProductPage(index, size int, where string) ([]*TProduct, int, error) {
+	//orm模块
+	ormHelper := orm.NewOrm()
+	//返回data数据
+	data := []*TProduct{}
+	dataCounts := []*TProduct{}
+	//返回数据列表
+	sql := fmt.Sprintf("select * from t_product %v  order by id desc limit %v offset %v", where, size, size*(index-1))
+	_, err := ormHelper.Raw(sql).QueryRows(&data)
+	if err != nil {
+		fmt.Printf("error is %v\n", err)
+	}
+	//返回计数
+	sqlCount := fmt.Sprintf("select * from t_product  %v ", where)
+	count, err1 := ormHelper.Raw(sqlCount).QueryRows(&dataCounts)
+	if err1 != nil {
+		fmt.Printf("error is %v\n", err1)
+	}
+	return data, int(count), err
+}
+
+//sql分页获取数据
+func GetProductPageBySql(index, size int, excSql string) ([]*TProduct, int, error) {
+	//orm模块
+	ormHelper := orm.NewOrm()
+	//返回data数据
+	data := []*TProduct{}
+	dataCounts := []*TProduct{}
+	//返回数据列表
+	sql := excSql + fmt.Sprintf(" limit %v offset %v", size, size*(index-1))
+	_, err := ormHelper.Raw(sql).QueryRows(&data)
+	if err != nil {
+		fmt.Printf("error is %v\n", err)
+	}
+	//返回计数
+
+	count, err1 := ormHelper.Raw(excSql).QueryRows(&dataCounts)
+	if err1 != nil {
+		fmt.Printf("error is %v\n", err1)
+	}
+	return data, int(count), err
+}
+
+//----------------------------扩展方法----------------------------------------
+//根据商品类别获取分页数据
 func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) ([]*TProduct, int, error) {
 	products := make([]*TProduct, 0)
 	o := orm.NewOrm()
@@ -77,21 +187,6 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	// beego.Info(products)
 	return products, int(totalNum), err
 }
-
-func AddProduct(productTypeId int64, userId int64, name string, count int, standardPrice float64, price float64, desc string, msg string) (int64, error) {
-	o := orm.NewOrm()
-	product := &TProduct{ProductTypeId: productTypeId, UserId: userId, Name: name, Count: count, StandardPrice: standardPrice, Price: price, Desc: desc, Msg: msg, CreateTime: time.Now().Format("2006-01-02 15:04:05"), SortId: 0}
-	pictureId, err := o.Insert(product)
-	return pictureId, err
-}
-
-func DelProduct(productId int64) error {
-	o := orm.NewOrm()
-	product := &TProduct{Id: productId}
-	_, err := o.Delete(product)
-	return err
-}
-
 func MdfyType(productId int64, productTypeId int64) error {
 	product, err := GetProductById(productId)
 	if err != nil {
