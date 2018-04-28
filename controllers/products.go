@@ -75,6 +75,7 @@ func (this *ProductController) Post() {
 			}
 			this.Data["json"] = map[string]interface{}{"status": 200, "productTypeId": productTypeId, "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
+			//this.Ctx.Output.JSON(data, hasIndent, coding)
 			return
 		}
 
