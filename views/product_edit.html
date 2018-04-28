@@ -19,7 +19,7 @@
     <ol class="breadcrumb" style="position:fixed;top:0;width:100vw">
         <li><a href="/products/?page=product_list">商品列表</a></li>
 
-        <li class="active">商品添加</li>
+        <li class="active">商品编辑</li>
     </ol>
 
     <div class="container" style="max-width:750px;margin-top:40px">
@@ -53,7 +53,7 @@
         </div>
         <div class="form-group" id="on_upload">           
             <input class="form-control" name="Filedata" type="file"  id="attachment" />
-            <div class="row" id="viewPictrues">
+            <div class="row" id="viewPictures">
 
             </div>
         </div>
@@ -74,6 +74,7 @@
     <script type="text/javascript" src="../static/js/ssi-uploader.js"></script>
     <script type="text/javascript" src="../static/js/center-loader.js"></script>
     <script type="text/javascript">
+        window.productId = getQueryString("productId")
         $("#attr_desc").summernote({ lang: "zh-CN", height: 400});
         //$('#attachment').ssi_uploader({
         //    url: 'url',
@@ -102,7 +103,7 @@
             var reader = new FileReader();
             reader.onload = function (e) {
                 //options.imgSrc = e.target.result;
-                $("#viewPictrues").append(builtViewPictrue(e.target.result))
+                $("#viewPictures").append(builtViewPicture(e.target.result))
             }
             for (var i = 0; i < imgs_list.length; i++) {
                 reader.readAsDataURL(imgs_list[i]);
@@ -130,23 +131,23 @@
                 url: location.origin +"/products",
                 data: {
                     types: 1,
-                    options: 1,
-                    productTypeId: $("#attr_productTypeId").val(),
-                    name: encodeURIComponent($("#attr_name").val()),
-                    price: $("#attr_price").val(),                  
-                    desc: encodeURIComponent($("#attr_desc").code()),
-                    count: $("#attr_count").val(), 
-                    standardPrice: $("#attr_standardPrice").val(),
-                    msg: encodeURIComponent( $("#attr_msg").val()), 
-
+                    options: 3,
+                    ProductTypeId: $("#attr_productTypeId").val(),
+                    Name: encodeURIComponent($("#attr_name").val()),
+                    Price: $("#attr_price").val(),                  
+                    Desc: encodeURIComponent($("#attr_desc").code()),
+                    Count: $("#attr_count").val(), 
+                    StandardPrice: $("#attr_standardPrice").val(),
+                    Msg: encodeURIComponent( $("#attr_msg").val()), 
+                    productId: window.productId 
                 },
                 type: "post",
                 dataType: "json",
                 success: function (e) {
 
                     if (e.status == "200") {
-                        var product_id = e.productId
-                        submitPictures(product_id)
+                        //var product_id = e.productId
+                        submitPictures(productId)
                         //var e = confirm("添加成功是否重新加载")
                         //if (e == true) {
                         //    location.reload()
@@ -165,33 +166,41 @@
         }
         //提交当产品图片
         function submitPictures(productId) {
-            var pictrues = $(".proPictrue")
-            var count = pictrues.length;
-            $(".proPictrue").each((index,item) => {
-                var isCover = 0;
-                if ($(item).find('input[name="isCover"]').is(':checked')) {
-                    isCover = 1;
-                }
-                var formdata = new FormData();
-                formdata.append("attachment", getBlob($(item).find('img.prePictrue').attr('src')), new Date().getTime()+ '.png');
-                formdata.append("options", "1")
-                formdata.append("isCover", isCover)
-                formdata.append("productId", productId)
-                var oReq = new XMLHttpRequest();
-                oReq.open("POST", location.origin + "/picture");
-                oReq.send(formdata);
-                oReq.onreadystatechange = function () {
-                    if (oReq.readyState == 4 && oReq.status == 200) {
-                        alert(oReq.responseText)
+            var pictures = $(".proPicture")
+            var count = pictures.length;
+            $(".proPicture").each((index, item) => {
+                if ($(item).find('[picId]').length==0) {
+                    var isCover = 0;
+                    if ($(item).find('input[name="isCover"]').is(':checked')) {
+                        isCover = 1;
+                    }
+                    var formdata = new FormData();
+                    formdata.append("attachment", getBlob($(item).find('img.prePicture').attr('src')), new Date().getTime() + '.png');
+                    formdata.append("options", "1")
+                    formdata.append("isCover", isCover)
+                    formdata.append("productId", productId)
+                    var oReq = new XMLHttpRequest();
+                    oReq.open("POST", location.origin + "/picture");
+                    oReq.send(formdata);
+                    oReq.onreadystatechange = function () {
+                        if (oReq.readyState == 4 && oReq.status == 200) {
+                            alert(oReq.responseText)
+                        }
                     }
                 }
+              
             })
            
         }
         //构建图片相册
-        function builtViewPictrue(src) {
-           
-            var img = '<div class="proPictrue" style="padding:10px;float:left"><p style=""><a onclick="$(this).parent().parent().remove()">删除</a></p><img class="prePictrue" src="' + src + '" style="max-width:100px;height:auto;"/><br><input type="radio" name="isCover"/>&nbsp;是否设置为封面</div>'
+        function builtViewPicture(src,isCover) {
+            
+            var img = '<div class="proPicture" style="padding:10px;float:left"><p style=""><a onclick="$(this).parent().parent().remove()">删除</a></p><img class="prePicture" src="' + src + '" style="max-width:100px;height:auto;"/><br><input type="radio" name="isCover" '+((isCover=="1")?"checked":"")+'/>&nbsp;是否设置为封面</div>'
+            return img
+        }
+        function builtViewPicture1(data) {
+
+            var img = '<div class="proPicture" style="padding:10px;float:left"><p style=""><a picId="' + data.Id+ '">删除</a></p><img class="prePicture" src="' + location.origin + "/" + data.Url + '" style="max-width:100px;height:auto;"/><br><input type="radio" name="isCover" ' + ((data.IsCover == "1") ? "checked" : "") + '/>&nbsp;是否设置为封面</div>'
             return img
         }
         //base64图片转换
@@ -235,6 +244,7 @@
                             $('#attr_productTypeId').append('<option value="' + e.productTypes[i].Id + '">' +
                                 decodeURIComponent(e.productTypes[i].TypeName) + '</option>')
                         }
+                        $('#attr_productTypeId').val(window.ProductTypeId);
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
@@ -247,16 +257,16 @@
                 },
             });
         }
-        bindData()
-        //绑定数据
-        function bindData() {
+        getProductData()
+        //绑定产品数据
+        function getProductData() {
             $.ajax({
                 url: location.origin + "/get",
                 data: {
                     //types: 0,
-                    options: 3,
+                    options:3,
                     productId: getQueryString("productId"),
-                    //getType: 0,
+                    //getType: 1,
                     //pageNo: 1,
                     //pageSize: 0
 
@@ -266,7 +276,7 @@
                 success: function (e) {
 
                     if (e.status == "200") {
-                        console.log(e)
+                        bindAttr(e)
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
@@ -279,11 +289,62 @@
                 },
             });
         }
+        //绑定属性
+        function bindAttr(data) {
+            //绑定商品属性
+            $("#attr_name").val(decodeURIComponent(data.product.Product.Name))
+            $("#attr_msg").val(decodeURIComponent(data.product.Product.Msg))
+            $("#attr_price").val(data.product.Product.Price)
+            $("#attr_standardPrice").val(data.product.Product.StandardPrice)
+            $("#attr_count").val(data.product.Product.Count)
+            $("#attr_productTypeId").val(data.product.Product.ProductTypeId)
+            window.ProductTypeId = data.product.Product.ProductTypeId
+            $("#attr_desc").code(decodeURIComponent(data.product.Product.Desc))
+            //绑定图片
+            for (var i = 0; i < data.product.Pictures.length; i++) {
+                $("#viewPictures").append(builtViewPicture1(data.product.Pictures[i]))
+            }
+            $("[picId]").bind("click", function () {
+                deletePicture($(this).attr('picId'))
+                $(this).parent().parent().remove()
+            })
+        }
         //获取url参数
         function getQueryString(name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
             var r = window.location.search.substr(1).match(reg);
             if (r != null) return unescape(r[2]); return null;
+        }
+        //删除图片
+        function deletePicture(pictureId) {
+            $.ajax({
+                url: location.origin + "/picture",
+                data: {
+                    //types: 0,
+                    options: 2,
+                    pictureId: pictureId,
+                    //getType: 1,
+                    //pageNo: 1,
+                    //pageSize: 0
+
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                       alert("删除成功")
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
         }
     </script>
 </body>

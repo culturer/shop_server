@@ -93,8 +93,8 @@ func (this *ProductController) Post() {
 		}
 
 		if options == 3 {
-			id, _ := strconv.ParseInt(this.Input().Get("Id"), 10, 64)
-			productType, _ := models.GetProductTypeById(id)
+			productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+			productType, _ := models.GetProductTypeById(productTypeId)
 
 			this.ParseForm(productType)
 			//util.formToModel(obj interface{},ctx *context)
@@ -198,7 +198,7 @@ func (this *ProductController) Post() {
 		if options == 1 {
 			product := new(models.TProduct)
 			this.ParseForm(product)
-
+			product.UserId, _ = this.GetSession("uid").(int64)
 			productId, err := this.addProduct(product)
 			if err != nil {
 				beego.Info(err.Error())
@@ -249,7 +249,7 @@ func (this *ProductController) Post() {
 		}
 
 		if options == 3 {
-			mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
+			//mdfyType, _ := strconv.Atoi(this.Input().Get("mdfyType"))
 			// [mdfyType == 0  修改分类]
 			// [mdfyType == 1  修改名称]
 			// [mdfyType == 2  修改库存]
@@ -260,117 +260,134 @@ func (this *ProductController) Post() {
 			// [mdfyType == 7  修改优先级]
 			productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
 
-			if mdfyType == 0 {
-				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
-				err := models.MdfyType(productId, productTypeId)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品分类失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品分类成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			product, _ := models.GetProductById(productId)
 
-			if mdfyType == 1 {
-				name := this.Input().Get("name")
-				err := models.MdfyName(productId, name)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品名称失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品名称成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			this.ParseForm(product)
+			//util.formToModel(obj interface{},ctx *context)
+			//beego.Info(product)
+			_, err := models.EditProduct(product)
 
-			if mdfyType == 2 {
-				count, _ := strconv.Atoi(this.Input().Get("count"))
-				err := models.MdfyCount(productId, count)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品库存失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品库存成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			if err != nil {
+				beego.Info(err.Error())
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
+			this.Data["json"] = map[string]interface{}{"status": 200, "product_id": productId, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
 
-			if mdfyType == 3 {
-				price, err := strconv.ParseFloat(this.Input().Get("price"), 32)
-				err = models.MdfyPrice(productId, price)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品价格失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品价格成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			// if mdfyType == 0 {
+			// 	productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
+			// 	err := models.MdfyType(productId, productTypeId)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品分类失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品分类成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
 
-			if mdfyType == 4 {
-				standardPrice, err := strconv.ParseFloat(this.Input().Get("standardPrice"), 32)
-				err = models.MdfyStandardPrice(productId, standardPrice)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品成本失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品成本成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			// if mdfyType == 1 {
+			// 	name := this.Input().Get("name")
+			// 	err := models.MdfyName(productId, name)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品名称失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品名称成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
 
-			if mdfyType == 5 {
-				desc := this.Input().Get("desc")
-				err := models.MdfyDesc(productId, desc)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品描述失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品描述成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			// if mdfyType == 2 {
+			// 	count, _ := strconv.Atoi(this.Input().Get("count"))
+			// 	err := models.MdfyCount(productId, count)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品库存失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品库存成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
 
-			if mdfyType == 6 {
-				msg := this.Input().Get("msg")
-				err := models.MdfyMsg(productId, msg)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品备注失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品备注成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			// if mdfyType == 3 {
+			// 	price, err := strconv.ParseFloat(this.Input().Get("price"), 32)
+			// 	err = models.MdfyPrice(productId, price)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品价格失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品价格成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
 
-			if mdfyType == 7 {
-				sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
-				err := models.MdfyProductSort(productId, sortId)
-				if err != nil {
-					beego.Info(err.Error())
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品优先级失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品优先级成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
+			// if mdfyType == 4 {
+			// 	standardPrice, err := strconv.ParseFloat(this.Input().Get("standardPrice"), 32)
+			// 	err = models.MdfyStandardPrice(productId, standardPrice)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品成本失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品成本成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
+
+			// if mdfyType == 5 {
+			// 	desc := this.Input().Get("desc")
+			// 	err := models.MdfyDesc(productId, desc)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品描述失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品描述成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
+
+			// if mdfyType == 6 {
+			// 	msg := this.Input().Get("msg")
+			// 	err := models.MdfyMsg(productId, msg)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品备注失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品备注成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
+
+			// if mdfyType == 7 {
+			// 	sortId, _ := strconv.Atoi(this.Input().Get("sortId"))
+			// 	err := models.MdfyProductSort(productId, sortId)
+			// 	if err != nil {
+			// 		beego.Info(err.Error())
+			// 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 修改商品优先级失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 		this.ServeJSON()
+			// 		return
+			// 	}
+			// 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 修改商品优先级成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+			// 	this.ServeJSON()
+			// 	return
+			// }
 		}
 
 	}

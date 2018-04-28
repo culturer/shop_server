@@ -102,6 +102,60 @@ func (this *PictureController) Post() {
 	}
 
 	if options == 3 {
+		_strProductId := this.Input().Get("productId")
+		_productId, _ := strconv.ParseInt(_strProductId, 10, 64)
+		_err := models.DelPictureByProductId(_productId)
+		if _err != nil {
+			beego.Error(_err)
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "删除原图片失败", "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		strProductId := this.Input().Get("productId")
+		productId, _ := strconv.ParseInt(strProductId, 10, 64)
+		isCover, _ := strconv.ParseBool(this.Input().Get("isCover"))
+		//创建用户目录
+		err := os.MkdirAll("pictures/"+strProductId, os.ModePerm)
+		if err != nil {
+			beego.Error(err)
+		}
+		// 获取附件
+		_, fh, ee := this.GetFile("attachment")
+		if ee != nil {
+			beego.Error(ee)
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": ee.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		var attachment string
+		if fh != nil {
+			//保存附件
+			attachment = fh.Filename
+			beego.Info(attachment)
+			myPath := path.Join("pictures/"+strProductId, attachment)
+			beego.Info(myPath)
+			err := this.SaveToFile("attachment", myPath)
+
+			if err != nil {
+				beego.Error(err)
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			pictureId, err := this.addPicture(productId, myPath, isCover)
+			if err != nil {
+				beego.Error(err)
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			this.Data["json"] = map[string]interface{}{"status": 200, "pictureId": pictureId, "url": myPath, "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
 
 	}
 

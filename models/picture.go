@@ -25,11 +25,16 @@ func AddPicture(productId int64, url string, isCover bool) (int64, error) {
 
 func DelPicture(pictureId int64) error {
 	o := orm.NewOrm()
-	picture := &TPartner{Id: pictureId}
+	picture := &TPicture{Id: pictureId}
 	_, err := o.Delete(picture)
 	return err
 }
-
+func DelPictureByProductId(productId int64) error {
+	o := orm.NewOrm()
+	picture := &TPicture{ProductId: productId}
+	_, err := o.Delete(picture)
+	return err
+}
 func GetPicturesByProductId(productId int64) ([]*TPicture, error) {
 	pictures := make([]*TPicture, 0)
 	o := orm.NewOrm()
