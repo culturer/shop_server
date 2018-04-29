@@ -42,10 +42,19 @@ func GetUserByTel(tel string) (*TUser, error) {
 	return user, err
 }
 
-//新建用户
-func AddUser(tel string, password, name string) (int64, error) {
+//查询账号
+func GetUserByVId(vid string) (*TUser, error) {
 	o := orm.NewOrm()
-	user := &TUser{Password: password, Tel: tel, Prov: 0, Name: name, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
+	user := new(TUser)
+	qs := o.QueryTable("t_user")
+	err := qs.Filter("vid", vid).One(user)
+	return user, err
+}
+
+//新建用户
+func AddUser(tel string, password, name string, vid string) (int64, error) {
+	o := orm.NewOrm()
+	user := &TUser{Password: password, Tel: tel, Prov: 0, Name: name, Vid: vid, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
 	userId, err := o.Insert(user)
 	return userId, err
 }

@@ -25,6 +25,7 @@ func (this *RegisterController) Post() {
 	//获取数据信息
 	pwd := this.Input().Get("pwd")
 	tel := this.Input().Get("tel")
+	vid := this.Input().Get("vid")
 	name := this.Input().Get("name")
 	//判断该手机号是否已经注册
 	user, err := this.getUser(tel)
@@ -40,7 +41,7 @@ func (this *RegisterController) Post() {
 	}
 
 	//注册用户
-	userId, err := this.addUser(tel, pwd, name)
+	userId, err := this.addUser(tel, pwd, name, vid)
 	if err != nil {
 		beego.Error(err)
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "register fail -- add user fail ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -55,9 +56,11 @@ func (this *RegisterController) Post() {
 }
 
 //新建User
-func (this *RegisterController) addUser(tel string, password, name string) (int64, error) {
-	userId, err := models.AddUser(tel, password, name)
+func (this *RegisterController) addUser(tel string, password, name string, vid string) (int64, error) {
+
+	userId, err := models.AddUser(tel, password, name, vid)
 	return userId, err
+
 }
 
 //获取User

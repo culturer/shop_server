@@ -106,7 +106,8 @@ func (this *UserController) Post() {
 		tel := this.Input().Get("tel")
 		password := this.Input().Get("password")
 		name := this.Input().Get("Name")
-		userId, err := this.addUser(tel, password, name)
+		vid := this.Input().Get("vid")
+		userId, err := this.addUser(tel, password, name, vid)
 		if err != nil {
 			beego.Info(err.Error())
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 新增用户异常,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -220,8 +221,8 @@ func (this *UserController) getUserByTel(tel string) (*models.TUser, error) {
 }
 
 //新建用户
-func (this *UserController) addUser(tel string, password, name string) (int64, error) {
-	userId, err := models.AddUser(tel, password, name)
+func (this *UserController) addUser(tel string, password, name string, vid string) (int64, error) {
+	userId, err := models.AddUser(tel, password, name, vid)
 	return userId, err
 }
 
