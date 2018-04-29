@@ -79,30 +79,28 @@ func (this *LoginController) Post() {
 			}
 		}
 
-		if options == 2 {
-			vid := this.Input().Get("vId")
-			user, err := this.getUserByVid(vid)
-			if err != nil || user == nil || user.Tel == "" || user.Password == "" {
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，账号或密码错误，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
-			//存session
-			uid := this.GetSession("uid")
-			if uid == nil {
-				//this.SetSession("uid", int(1))
-				this.SetSession("uid", user.Id)
-				beego.Info(fmt.Sprintf("uid:%v", this.GetSession("uid"))) //this.Data["num"] = 0
-			} else {
-				this.SetSession("uid", user.Id)
-				//this.Data["num"] = v.(int)
-			}
-			//返回userId
-			this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	} else if options == 2 {
+		vid := this.Input().Get("vId")
+		user, err := this.getUserByVid(vid)
+		if err != nil || user == nil || user.Tel == "" || user.Password == "" {
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，账号或密码错误，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}
-
+		//存session
+		uid := this.GetSession("uid")
+		if uid == nil {
+			//this.SetSession("uid", int(1))
+			this.SetSession("uid", user.Id)
+			beego.Info(fmt.Sprintf("uid:%v", this.GetSession("uid"))) //this.Data["num"] = 0
+		} else {
+			this.SetSession("uid", user.Id)
+			//this.Data["num"] = v.(int)
+		}
+		//返回userId
 		this.Data["json"] = map[string]interface{}{"status": 200, "userId": user.Id, "msg": "login success ", "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
 		return
