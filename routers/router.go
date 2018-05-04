@@ -29,7 +29,7 @@ func init() {
 	//获取信息接口
 	beego.Router("/get", &controllers.GetController{})
 	//获取openId
-	beego.Router("/ope", &controllers.OpenIdController{})
+	// beego.Router("/ope", &controllers.OpenIdController{})
 	var FilterUser = func(ctx *context.Context) {
 
 		if ctx.Request.RequestURI != "/login" {
