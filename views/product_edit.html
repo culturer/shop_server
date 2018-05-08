@@ -32,27 +32,28 @@
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-6"><input type="text" required id="attr_price" class="form-control" placeholder="售价" /></div>
-                <div class="col-sm-6"><input type="text" id="attr_standardPrice" class="form-control" placeholder="成本价" /></div>
+                <div class="col-sm-3"><label>售价</label><input type="text" required id="attr_price" class="form-control" placeholder="售价" /></div>
+                <div class="col-sm-3"><label>原价</label><input type="text" id="attr_standardPrice" class="form-control" placeholder="成本价" /></div>
+                <div class="col-sm-3"><label>库存</label><input id="attr_count" required type="number" class="form-control" placeholder="库存" /></div>
+                <div class="col-sm-3"><label>排序</label><input id="attr_sort_id" required type="number" class="form-control" placeholder="排序，值小的在前面" /></div>
             </div>
 
 
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-4"><input id="attr_count" required type="number" class="form-control" placeholder="库存" /></div>
                 <div class="col-sm-4">
-                    <select required id="attr_productTypeId"  class="form-control">
-                       
-                    </select>
+                    <select required id="attr_productTypeId" class="form-control"></select>
                 </div>
-               
+                <div class="col-sm-4">
+                    <label>是否首页轮播</label><input style="margin:5px" type="checkbox" id="attr_is_carousel" />
+                </div>
             </div>
 
 
         </div>
-        <div class="form-group" id="on_upload">           
-            <input class="form-control" name="Filedata" type="file"  id="attachment" />
+        <div class="form-group" id="on_upload">
+            <input class="form-control" name="Filedata" type="file" id="attachment" />
             <div class="row" id="viewPictures">
 
             </div>
@@ -139,7 +140,9 @@
                     Count: $("#attr_count").val(), 
                     StandardPrice: $("#attr_standardPrice").val(),
                     Msg: encodeURIComponent( $("#attr_msg").val()), 
-                    productId: window.productId 
+                    productId: window.productId,
+                    IsCarousel: ($("#attr_is_carousel").is(":checked")) ? 1 : 0,
+                    SortId: $("#attr_sort_id").val()
                 },
                 type: "post",
                 dataType: "json",
@@ -184,13 +187,13 @@
                     oReq.send(formdata);
                     oReq.onreadystatechange = function () {
                         if (oReq.readyState == 4 && oReq.status == 200) {
-                            alert(oReq.responseText)
+                            console.log(oReq.responseText)
                         }
                     }
                 }
               
             })
-           
+            alert("修改成功")
         }
         //构建图片相册
         function builtViewPicture(src,isCover) {
@@ -300,6 +303,8 @@
             $("#attr_productTypeId").val(data.product.Product.ProductTypeId)
             window.ProductTypeId = data.product.Product.ProductTypeId
             $("#attr_desc").code(decodeURIComponent(data.product.Product.Desc))
+            $("#attr_sort_id").val(data.product.Product.SortId)
+            $("#attr_is_carousel")[0].checked = (data.product.Product.IsCarousel == "1") ? true : false
             //绑定图片
             for (var i = 0; i < data.product.Pictures.length; i++) {
                 $("#viewPictures").append(builtViewPicture1(data.product.Pictures[i]))

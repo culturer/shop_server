@@ -165,8 +165,9 @@ func (this *ProductController) Post() {
 				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
 				pageNo, _ := strconv.Atoi(this.Input().Get("pageNo"))
 				pageSize, _ := strconv.Atoi(this.Input().Get("pageSize"))
+				where := this.Input().Get("where")
 
-				products, totalPage, err := this.getProducts(productTypeId, pageNo, pageSize)
+				products, totalPage, err := this.getProducts(productTypeId, pageNo, pageSize, where)
 				if err != nil {
 					beego.Info(err.Error())
 					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品列表失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -423,8 +424,8 @@ func (this *ProductController) getProduct(productId int64) (*models.TProduct, er
 	return product, err
 }
 
-func (this *ProductController) getProducts(productTypeId int64, pageNo, pageSize int) ([]*models.TProduct, int, error) {
-	products, totalPage, err := models.GetProductByType(productTypeId, pageNo, pageSize, "")
+func (this *ProductController) getProducts(productTypeId int64, pageNo, pageSize int, where string) ([]*models.TProduct, int, error) {
+	products, totalPage, err := models.GetProductByType(productTypeId, pageNo, pageSize, where)
 	return products, totalPage, err
 }
 

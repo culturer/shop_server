@@ -1,0 +1,148 @@
+<view class='container-fluid' wx:for="{{listData}}" wx:key="unique">
+
+  <view class='page-header' hidden='{{head_hidden}}' style='opacity:{{headPacity}};'>
+    <!-- 详情内容链接  -->
+    <view class="nav">
+      <view bindtap='jumpTo' data-opt="body_product"><view class='icon icon_product hidd{{active?1:0}}'></view>宝贝</view>
+      <view bindtap='jumpTo' data-opt="body_evaluate"><view class='icon icon_evaluate hidd{{active?1:0}}'></view>评价</view>
+      <view bindtap='jumpTo' data-opt="body_detail"><view class='icon icon_detail hidd{{active?1:0}}'></view>详情</view>
+      <view bindtap='jumpTo' data-opt="body_recommend"><view class='icon icon_recommend hidd{{active?1:0}}'></view>推荐</view>
+    </view>
+  </view>
+
+
+  <scroll-view class="page-body" scroll-into-view="{{toView}}" scroll-y="true" bindscroll="scroll" scroll-with-animation="true" style='top:{{bodyTop}}%'>
+    <!-- 商品图片展示及简介  -->
+    <view id="body_product" data-rol="body_product">
+      <!-- 商品图片 -->
+      <view class="body-pro-pic">
+          <swiper indicator-dots="{{indicatorDots}}"
+          autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" circular='{{circular}}'>
+          <block wx:for="{{item.pro_imgURL}}" wx:for-item='proPicItem' wx:key="unique">
+            <swiper-item>
+              <image src="{{proPicItem}}" class="slide-image" width="355" height="150"/>
+            </swiper-item>
+          </block>
+        </swiper> 
+      </view>
+      <!-- 商品简介 -->
+      <view class="body-pro-des">
+        <view class='pro-price'>
+          <view>￥{{item.nowPrice}} 早买早优惠</view>
+          <view>价格￥<text style='text-decoration:line-through;'>{{item.oldPrice}}</text></view>
+        </view>
+        <view class='pro-title'>{{item.pro_description}}</view>
+        <view class='pro-sale'>
+          <view>包邮</view>
+          <view>销量{{item.month_sales}}笔</view>
+          <view>四川成都</view>
+        </view>
+        <view class='pro-server pro-all'>
+          <view bindtap="showModals1" data-statu="open">
+            <text>促销</text>
+            <text>*********</text>
+            <text decode='true'>&gt;</text>
+          </view>
+          <view bindtap="showModals2" data-statu="open">
+            <text>服务</text>
+            <text>*********</text>
+            <text decode='true'>&gt;</text>
+          </view>
+          <view bindtap="showModals0" data-statu="open">
+            <text>已选择</text>
+            <text>每件参数;{{buyNum}}件</text>
+            <text decode='true'>&gt;</text>
+          </view>
+          <view class="pro-parameter" bindtap="showModals3" data-statu="open">
+            <text>规格</text>
+            <text>参数简介...</text>
+            <text decode='true'>&gt;</text>
+          </view>
+          <view class="drawer_screen" bindtap="showModals{{modalNum}}" data-statu="close" wx:if="{{showModalStatus}}"></view> 
+          <view animation="{{animationData}}" class="showModal" wx:if="{{showModalStatus}}">
+            <view class='modalTitle'>{{title}}</view>
+            <view class='modalContent'>
+              <block wx:for='{{content}}' wx:for-item='modalitem' wx:for-index='modalIndex' wx:key="unique" class='modalList'>
+                <view>
+                  <view>{{modalitem.name}}</view>
+                  <view>{{modalitem.value}}</view>
+                </view>
+              </block>  
+            </view>
+          <view class="modalClose" bindtap="showModals{{modalNum}}" data-statu="close">完成</view> 
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 商品评价  -->
+    <view id="body_evaluate" data-rol="body_evaluate" class="test" upper-threshold="200">
+      <view>
+        <view class='body-eva-title'>
+          <text>累计评价({{evaluteAll}})</text>
+          <text decode='true'>查看全部&nbsp;&gt;</text>
+        </view>
+        <view class='body-eva-kind'>
+          <text>口感不错({{evalute_1}})</text>
+          <text>实惠({{evalute_2}})</text>
+          <text>新鲜({{evalute_3}})</text>
+        </view>
+        <view class="page-body-info">
+          
+        </view>
+        <view class="eva-area">
+          <text>待导入评论内容</text>
+          <text bindtap="getUserInfo">获取用户信息</text>
+        </view>
+        <view class='shop-info'>
+          <view class='shop-message'>
+            <image src='../../images/fruit_1.jpg' alt='店铺logo'></image>
+            <text>店铺名</text>
+            <view style='display:inline-block' class='shop-goods'>
+              <text>全部宝贝</text>
+              <text>进店逛逛</text>
+            </view>
+          </view>
+          <view class='pro-sale shop-server'>
+            <view>宝贝描述 <text>{{server_1}} {{score_1}}</text></view>
+            <view>卖家服务 <text>{{server_2}} {{score_2}}</text></view>
+            <view>物流服务 <text>{{server_3}} {{score_3}}</text></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 商品详情介绍  -->
+    <view id="body_detail" data-rol="body_detail" class="test">
+      <image src='../../images/fruit_1.jpg'></image>
+      <image src='../../images/fruit_2.jpg'></image>
+      <image src='../../images/fruit_3.jpg'></image>
+      <image src='../../images/fruit_4.jpg'></image>
+    </view>
+    <!-- 相关商品推荐  -->
+    <view id="body_recommend" data-rol="body_recommend" class="test" style='height:300px;'>
+      推荐
+    </view>
+  </scroll-view>
+
+  <view class='page-footer'>
+    <!-- 详情内容链接  -->
+    <view class="foot-server">
+      <view bindtap='' class='foot-serv'>
+        <view class='icon icon_house'></view>
+        <view>店铺</view>
+      </view>
+      <view bindtap=''  class='foot-serv'>
+        <view class='icon icon_server'></view>
+        <view>客服</view>
+      </view>
+      <view bindtap=''  class='foot-serv'>
+        <view class='icon icon_collect'></view>
+        <view>收藏</view>
+      </view>
+      <view bindtap='' class='foot-shop'>
+        <view bindtap='addToCart'>加入购物车</view>
+        <view bindtap='goPay'>立即购买</view>
+      </view>
+    </view>
+  </view>
+
+</view>

@@ -70,6 +70,7 @@
                         <el-button @click="toggleSelection()">取消选择</el-button>
                         <el-button type="warning" @click="batchDelete()">移除</el-button>
                         <el-button type="success" @click="location.href='?page=product_add'">新增</el-button>
+                        <el-button type="primary" @click="location.reload()">刷新</el-button>
                     </el-col>
                 </el-row>
                 
@@ -148,18 +149,18 @@
     <script type="text/javascript" src="../static/js/element.min.js"></script>
     <script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript">
-
+  
         var vm = new Vue({
             el: '#app',
             data: {
                 selectIds:[],
                 tableData: "",
-                pageSize: "3",
+                pageSize: "5",
                 pageTotal:"0",
                 currentPage:"1",
                 loading: true,
                 typeList: "",
-                productTypeId:0
+                productTypeId:""
             },
             methods: {
 
@@ -223,7 +224,7 @@
             }
 
         });
-        getPageData(1,2,0);
+        getPageData(1,5,0);
         //初始化数据
         function getPageData(pageNo, pageSize, productTypeId) {
             vm.currentPage = pageNo;

@@ -1,0 +1,13 @@
+<view class='form-item h3 text-center'>请完善用户资料</view>
+<view class='form-item'>
+  <label style='width:30%' class='form-label'>名字：</label> <input style='width:70%'  class='form-input' placeholder='请输入名字'></input>
+</view>
+<view class='form-item'>
+  <label style='width:30%' class='form-label'>电话：</label> <input style='width:70%'  class='form-input' placeholder='请输入电话'></input>
+</view>
+<view class='form-item'>
+  <label style='width:30%' class='form-label'>密码：</label> <input style='width:70%'  class='form-input' placeholder='请输入密码'></input>
+</view>
+<view class='form-item'>
+ <button>注册</button>
+</view>

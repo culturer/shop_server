@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>商品详情</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<!--App自定义的css-->
+		<!--<link rel="stylesheet" type="text/css" href="css/app.css"/>-->
+		<style type="text/css">
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			p img {
+				max-width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body >
+		<!--<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">图片轮播</h1>
+		</header>-->
+	    <div class="mui-content" id="app">
+	    	<div id="slider" class="mui-slider" >
+			<div class="mui-slider-group mui-slider-loop">
+				<!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+				<div class="mui-slider-item mui-slider-item-duplicate">
+					<a href="#">
+						<img src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1">
+					</a>
+				</div>
+				<!-- 第一张 -->
+				<div class="mui-slider-item">
+					<a href="#">
+						<img src="images/shuijiao.jpg" data-preview-src="" data-preview-group="1">
+					</a>
+				</div>
+				<!-- 第二张 -->
+				<div class="mui-slider-item">
+					<a href="#">
+						<img src="images/muwu.jpg" data-preview-src="" data-preview-group="1">
+					</a>
+				</div>
+				<!-- 第三张 -->
+				<div class="mui-slider-item">
+					<a href="#">
+						<img src="images/cbd.jpg" data-preview-src="" data-preview-group="1">
+					</a>
+				</div>
+				<!-- 第四张 -->
+				<div class="mui-slider-item">
+					<a href="#">
+						<img src="images/yuantiao.jpg">
+					</a>
+				</div>
+				<!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+				<div class="mui-slider-item mui-slider-item-duplicate">
+					<a href="#">
+						<img src="images/shuijiao.jpg">
+					</a>
+				</div>
+			</div>
+			<div class="mui-slider-indicator">
+				<div class="mui-indicator mui-active"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+			</div>
+		</div>
+        <ul class="mui-table-view">
+		    <li class="mui-table-view-cell"><label>标题:</label>{{product.Product.Name}}</li>
+		    <li class="mui-table-view-cell"><label>价格:</label>现价￥{{product.Product.Price}}<span style="text-decoration:line-through;padding-left: 1em;">原价￥{{product.Product.StandardPrice}}</span> </li>
+		    <li class="mui-table-view-cell"><label>描述:</label>{{product.Product.Msg}}</li>
+		    
+	    </ul>
+	    <div style="padding: 5px 5px 0;">
+	    		    <button type="button" class="mui-btn mui-btn-blue mui-btn-block" >加入购物车</button>
+
+	    </div>
+	    <div class="mui-table-view">
+	    	<h4 class="mui-table-view-cell">商品描述</h4>
+	    	<div class="mui-table-view-cell" v-html="product.Product.Desc">
+	    		
+	    	</div>
+	    	
+	    </div>
+	    </div>
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.zoom.js"></script>
+	    <script src="js/mui.previewimage.js"></script>
+		<script src="js/vue.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+		mui.previewImage();
+			mui.init({
+				swipeBack:true //启用右滑关闭功能
+			});
+			var slider = mui("#slider");
+			//slider.slider({
+			//			interval: 5000
+			//		});
+		//vue部分
+            var data = { "Product": { "Id": 7, "SortId": 0, "UserId": 1, "ProductTypeId": 3, "PartnerId": 0, "Name": "商品测试3", "Count": 66, "Price": 34, "StandardPrice": 56, "Desc": "<div class=\"dict_banner\" style=\"margin-bottom: 20px; color: rgb(102, 102, 102); font-family: &quot;Microsoft YaHei&quot;, 宋体; font-size: 13px;\"><a id=\"ads_banner\" target=\"_blank\" href=\"https://bingdict.chinacloudsites.cn/download?tag=BDPDV\" h=\"ID=Dictionary,5090.1\" style=\"color: rgb(96, 0, 144);\"><img width=\"718\" height=\"68\" class=\"rms_img\" src=\"https://cn.bing.com/th?id=OJ.2Eh3yWRgmXNSkA&amp;pid=MSNJVFeeds\" data-bm=\"7\" style=\"border-collapse: collapse; border-spacing: 0px; list-style: none; margin: 0px; padding: 0px;\"></a></div><div class=\"client_homepage_leftside_area\" style=\"width: 273px; float: left; overflow: hidden; margin-right: 15px; color: rgb(102, 102, 102); font-family: &quot;Microsoft YaHei&quot;, 宋体; font-size: 13px;\"><div class=\"client_daily_words_panel\"><div class=\"client_daily_word_title hp_title\" style=\"font-size: 16px; font-weight: bold; margin-bottom: 15px; width: 273px; overflow: hidden; height: 20px;\">每日词汇</div><div class=\"client_daily_word_content\" style=\"background-color: rgb(240, 240, 240); padding: 15px; height: 270px;\"><div class=\"client_daily_words_bar\" style=\"overflow: hidden;\"><div class=\"client_daily_word_en\" style=\"overflow: hidden; padding-bottom: 10px; font-size: 26px;\"><a href=\"https://cn.bing.com/dict/search?q=migrate&amp;FORM=BDVSP6&amp;mkt=zh-cn\" h=\"ID=Dictionary,5092.1\" style=\"color: rgb(96, 0, 144);\">migrate</a></div><div class=\"client_daily_word_pn\" style=\"overflow: hidden; width: 243px;\"><div class=\"client_daily_word_pn_pn\" lang=\"en\" style=\"float: left; font-size: 14px; margin: 0px 0px 5px; line-height: 20px;\">美['maɪ.ɡreɪt]</div><div class=\"client_daily_word_pn_audio\" style=\"float: left; padding-left: 10px;\"><div class=\"client_icon_container\" style=\"width: 24px; height: 24px; overflow: hidden; cursor: pointer;\"><a class=\"client_aud_o\" title=\"点击朗读\" h=\"ID=Dictionary,5093.1\" style=\"color: rgb(96, 0, 144); display: block; width: 24px; height: 24px; background-image: url(&quot;/s/dictionary/speaker_normal.png&quot;); background-repeat: no-repeat;\"></a></div></div></div><div class=\"client_daily_word_pn\" style=\"overflow: hidden; width: 243px;\"><div class=\"client_daily_word_pn_pn\" lang=\"en\" style=\"float: left; font-size: 14px; margin: 0px 0px 5px; line-height: 20px;\">英[maɪ'ɡreɪt]</div><div class=\"client_daily_word_pn_audio\" style=\"float: left; padding-left: 10px;\"><div class=\"client_icon_container\" style=\"width: 24px; height: 24px; overflow: hidden; cursor: pointer;\"><a class=\"client_aud_o\" title=\"点击朗读\" h=\"ID=Dictionary,5094.1\" style=\"color: rgb(96, 0, 144); display: block; width: 24px; height: 24px; background-image: url(&quot;/s/dictionary/speaker_normal.png&quot;); background-repeat: no-repeat;\"></a></div></div></div><div class=\"client_daily_word_zh\" style=\"overflow: hidden; padding-top: 5px; padding-bottom: 15px; font-size: 20px;\">v. 迁移；移居</div></div><div class=\"client_daily_pic_bar\" style=\"overflow: hidden; width: 243px;\"><a target=\"_blank\" class=\"client_daily_pic_item\" href=\"https://cn.bing.com/images/search?q=migrate&amp;FORM=BDCN14&amp;mkt=zh-cn\" h=\"ID=Dictionary,5095.1\" style=\"color: rgb(96, 0, 144); float: left; width: 80px; height: 80px; margin-right: 1px;\"><img height=\"80\" width=\"80\" id=\"emb46A7C326\" class=\"rms_img\" src=\"https://wordchallenge.blob.core.windows.net/dicthpimage/migrate_1.jpg\" data-bm=\"8\" style=\"border-collapse: collapse; border-spacing: 0px; list-style: none; margin: 0px; padding: 0px;\"></a><a target=\"_blank\" class=\"client_daily_pic_item\" href=\"https://cn.bing.com/images/search?q=migrate&amp;FORM=BDCN14&amp;mkt=zh-cn\" h=\"ID=Dictionary,5095.2\" style=\"color: rgb(96, 0, 144); float: left; width: 80px; height: 80px; margin-right: 1px;\"><img height=\"80\" width=\"80\" id=\"emb15FFA1156\" class=\"rms_img\" src=\"https://wordchallenge.blob.core.windows.net/dicthpimage/migrate_2.jpg\" data-bm=\"9\" style=\"border-collapse: collapse; border-spacing: 0px; list-style: none; margin: 0px; padding: 0px;\"></a><a target=\"_blank\" class=\"client_daily_pic_item\" href=\"https://cn.bing.com/images/search?q=migrate&amp;FORM=BDCN14&amp;mkt=zh-cn\" h=\"ID=Dictionary,5095.3\" style=\"color: rgb(96, 0, 144); float: left; width: 80px; height: 80px; margin-right: 1px;\"><img height=\"80\" width=\"80\" id=\"emb26360BEA9\" class=\"rms_img\" src=\"https://wordchallenge.blob.core.windows.net/dicthpimage/migrate_3.jpg\" data-bm=\"10\" style=\"border-collapse: collapse; border-spacing: 0px; list-style: none; margin: 0px; padding: 0px;\"></a></div><div id=\"shareview\" class=\"client_share_bar\" style=\"margin-top: 15px; padding-top: 5px; height: 20px;\"><div class=\"shareText\" style=\"float: left; margin: 0px 10px 0px 0px;\">共享到:</div></div></div></div></div>\n        ", "Msg": "博格华纳好久没", "CreateTime": "2018-05-03 10:46:28", "CoverUrl": "", "BuyNum": 0, "IsCarousel": 0 }, "Pictures": [{ "Id": 23, "ProductId": 7, "Url": "https://localhost/pictures/7/1525315588586.png", "IsCover": false }, { "Id": 24, "ProductId": 7, "Url": "https://localhost/pictures/7/1525315588624.png", "IsCover": true }], "ProductType": { "Id": 3, "TypeName": "水果3", "CreateTime": "2018-04-27 16:46:51", "SortId": 3 } }
+		var vm=new Vue({
+			 el: '#app',
+			data:{
+				product:data,
+				test:"test"
+			},
+		})
+		</script>
+	</body>
+
+</html>

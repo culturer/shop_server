@@ -1,9 +1,9 @@
 package models
 
 import (
-	"fmt"
-	//"github.com/astaxie/beego"
 	"errors"
+	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -24,7 +24,7 @@ type TProduct struct {
 	Count int
 	//价格
 	Price float64
-	//成本价
+	//原价
 	StandardPrice float64
 	//产品描述
 	Desc string `orm:"type(text);null"`
@@ -33,6 +33,12 @@ type TProduct struct {
 
 	//创建时间
 	CreateTime string
+	//封面图片
+	CoverUrl string
+	//购买数量
+	BuyNum int
+	//是否首页轮播
+	IsCarousel int
 }
 
 //-------------------------------基本方法------------------------------------------
@@ -78,7 +84,7 @@ func DelProduct(productId int64) error {
 func DelProducts(ids string) (bool, error) {
 
 	result := true
-	sql := fmt.Sprintf("delete * from t_product id in(%v)", ids)
+	sql := fmt.Sprintf("delete * from t_product where id in(%v)", ids)
 	o := orm.NewOrm()
 	res, err := o.Raw(sql).Exec()
 	if err == nil {
@@ -158,18 +164,14 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	var sql string
 	//var num int64
 	var err error
-	if where != "" {
-		sql = "select * from t_product where product_type_id = ? and ? order by id desc limit ? offset ?"
-		_, err = o.Raw(sql, productTypeId, where, pageSize, pageSize*(pageNo-1)).QueryRows(&products)
 
-	} else {
-		sql = fmt.Sprintf("select * from t_product where product_type_id = %v order by id desc limit %v offset %v", productTypeId, pageSize, pageSize*(pageNo-1))
-		if productTypeId == 0 {
-			sql = fmt.Sprintf("select * from t_product order by id desc limit %v offset %v", pageSize, pageSize*(pageNo-1))
+	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where product_type_id = %v %v order by sort_id  limit %v offset %v", productTypeId, where, pageSize, pageSize*(pageNo-1))
+	if productTypeId == 0 {
+		sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id where 1=1 %v order by sort_id  limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
 
-		}
-		_, err = o.Raw(sql).QueryRows(&products)
 	}
+	_, err = o.Raw(sql).QueryRows(&products)
+
 	products1 := make([]*TProduct, 0)
 	sqlCount := fmt.Sprintf("select * from t_product where product_type_id = %v ", productTypeId)
 	if productTypeId == 0 {
@@ -185,6 +187,7 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	// mTotalNum := int(totalNum)
 	// totalPage := mTotalNum/pageSize + 1
 	// beego.Info(products)
+	beego.Info(sql)
 	return products, int(totalNum), err
 }
 func MdfyType(productId int64, productTypeId int64) error {

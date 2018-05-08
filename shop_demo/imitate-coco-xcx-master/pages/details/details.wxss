@@ -1,0 +1,294 @@
+/* pages/details/details.wxss */
+
+/* icon图标位置 */
+.icon_product{background-position:0px 0px;}
+.icon_evaluate{background-position:0px -21px;}
+.icon_detail{background-position:-63px -21px;}
+.icon_recommend{background-position:-42px -21px;}
+.icon_house{background-position:-63px 0px;}
+.icon_server{background-position:-125px 0px;}
+.icon_collect{background-position:-21px -21px;}
+
+
+page{
+    position: relative;
+    height: 100%;
+
+}
+.container-fluid{
+  width: 100%;
+   height: 100%; 
+  display: flex;
+  flex-direction:column;
+  align-items:center;
+}
+/* 页面导航头部开始  */
+.container-fluid .page-header{
+  width: 100%;
+  height: 9%;
+  position: fixed;
+  z-index: 100;
+  background: #fff; 
+  border-bottom: 2px solid #ccc;
+}
+.nav{
+  display: flex; 
+  justify-content: space-around;
+  line-height:50px;
+  color: #000;
+  width: 100%;
+}
+.nav view{
+  margin-right: 2px;
+}
+
+/* 页面导航头部结束  */
+
+
+/* 页面内容部分开始  */
+.page-body{
+  height:90%;
+  position: absolute;
+}
+/* 页面内容-宝贝开始  */
+#body_product{
+  width: 100%;
+}
+#body_product,#body_evaluate,#body_detail,#body_recommend{
+  position: relative;
+}
+.body-pro-des{
+  padding: 20rpx;
+}
+.body-pro-des >view{
+  margin: 20rpx 0;
+}
+.pro-price{
+  color: #ccc;
+}
+.pro-price view:first-child{
+  color: #f60;
+}
+.pro-sale >view{
+  display: inline-block;
+  width: 33%;
+  color: #ccc;
+}
+.pro-sale >view:last-child{
+  text-align: end;
+}
+.pro-all{
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom:2px solid #f0f0f0;
+}
+.pro-all, .pro-parameter{
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top:2px solid #f0f0f0;
+}
+.pro-all >view{
+  padding: 5px 0;
+}
+.pro-all >view >text{
+  display: inline-block;
+  width: 33%;
+  text-align: right;
+  color: #666;
+}
+.pro-all >view >text:first-child{
+  text-align: left;
+}
+.pro-all >view >text:nth-child(2){
+  color: #000;
+}
+.showModal{
+  position: fixed;
+  width: 100%;
+  height: 80%;
+  top:20%;
+  left:0;
+  background: #fff;
+  z-index: 1000;
+  text-align: center;
+  border-radius: 20px 20px 0 0;
+
+}
+.showModal >view{
+  width: 100%;
+  position: absolute;
+  height: 50px;
+}
+.modalTitle{
+  top:0;
+  font-weight: bold;
+  line-height: 50px;
+}
+.showModal .modalContent{
+  width: 90%;
+  left: 5%;
+  top:50px;
+  height:calc( 100% - 100px );
+  overflow-y: scroll;
+}
+.modalContent >view{
+  overflow: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 40rpx 0;
+  border-bottom: 1px solid #ccc;
+}
+.modalContent >view >view{
+  width:75%;
+  text-align: left;
+}
+.modalContent >view >view:first-child{
+  width: 20%;
+  padding-right: 20rpx; 
+  font-weight: bold;
+}
+.showModal .modalClose{
+  bottom:0;
+  width: 70%;
+  height: 30px;
+  left: 15%;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  color: #fff;
+  background: linear-gradient(to right, rgb(255, 120, 1) , rgb(255, 70, 1));
+  line-height:30px;
+}
+.modalTitle , .modalClose{
+  font-size: 16px;
+}
+.drawer_screen {  
+  width: 100%;  
+  height: 100%;  
+  position: fixed;  
+  top: 0;  
+  left: 0;  
+  z-index: 999;  
+  background: #000;  
+  opacity: 0.5;  
+  overflow: hidden;  
+}
+/* 页面内容-宝贝结束  */
+
+/* 页面内容-评价开始  */
+.body-eva-title >text{
+  display: inline-block;
+}
+.body-eva-title >text:last-child{
+  float: right;
+  text-align: end;
+  color: #f60;
+}
+.body-eva-kind >text{
+  display: inline-block;
+  height:20px;
+  line-height: 20px;
+  border-radius: 10px;
+  background: pink;
+  margin: 10px;
+  padding: 0 10px;
+}
+.page-body-info {
+  padding-bottom: 0;
+  height: 40px;
+}
+.userinfo-avatar {
+  display: inline-block;
+  border-radius: 20px;
+  margin: 0 20px;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+}
+.userinfo-nickname{
+  font-size: 14px;
+}
+.shop-goods{
+  float: right;
+}
+.shop-goods >text{
+  display: inline-block;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #f60;
+  color: #f60;
+  margin-right:10px; 
+}
+.shop-message{
+  padding: 10rpx;
+}
+.shop-message >image{
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
+  padding: 0 20rpx;
+}
+.shop-goods >text:first-child{
+  border-color:#ccc;
+  color: #ccc;
+}
+.shop-server{
+  margin: 10px 0;
+  padding: 0 10px;
+}
+.shop-info .shop-server >view >text{
+  color: green;
+}
+/* 页面内容-评价结束  */
+
+/* 页面内容-详情开始  */
+/* 页面内容-详情结束  */
+
+/* 页面内容-推荐开始  */
+/* 页面内容-推荐结束  */
+
+
+/* 页面内容部分结束  */
+
+
+/* 页面底部开始  */
+.page-footer{
+  width: 100%;
+  position: fixed;
+  height: 10%;
+  bottom: 0;
+  background:rgba(255,255,255, 0.9);
+  border-top:2px solid #ccc;
+}
+.foot-server{
+  display: flex; 
+  justify-content: space-around;
+  height:50px;
+  color: #000;
+  width: 100%;
+}
+.foot-serv >view{
+  height: 20px;
+  margin-top: 5px;
+  line-height: 20px;
+}
+.foot-serv >view:last-child{
+  margin-top:0px;
+}
+.foot-shop >view{
+  display: inline-block;
+  line-height: 30px;
+  height: 30px;
+  margin: 10px auto;
+  padding: 0 40rpx;
+  background: greenyellow;
+}
+.foot-shop >view:first-child{
+  background: #fc0;
+  border-radius: 15px 0 0 15px;
+}
+.foot-shop >view:last-child{
+  background: #f60;
+  border-radius:0 15px 15px 0;
+  background: #f60;
+}
+/* 页面底部结束  */

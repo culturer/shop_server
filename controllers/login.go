@@ -40,8 +40,8 @@ func (this *LoginController) Post() {
 		user, err := this.getUser(tel)
 
 		if err != nil {
-			beego.Info(err.Error())
-			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，用户不存在，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+			beego.Info("tel:" + tel)
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，用户不存在！", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
 		}

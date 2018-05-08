@@ -1,0 +1,7 @@
+.tui-menu-list{
+  line-height: 80rpx;
+  color: #555;
+  font-size: 35rpx;
+  padding: 0 0rpx 0 10px;
+  position: relative;
+}

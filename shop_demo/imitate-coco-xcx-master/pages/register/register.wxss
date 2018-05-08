@@ -1,0 +1,82 @@
+.container{padding: 0;}
+form{
+  width: 90%;
+  margin-left: auto;
+  margin-right:auto;
+  position: fixed;
+  top: 200rpx;
+}
+swiper{
+  height:50px;
+}
+.registBg{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 0;
+}
+.form-title >view{
+  width: 100%;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content:center; 
+  align-items:center;
+}
+.form-title .title-regist view{
+  padding: 20rpx 40rpx;
+  font-size: 40rpx;
+  color:#ccc;
+}
+.form-title .title-regist .active{
+  color:#fff;
+  border-bottom: 2px solid #f60;
+}
+
+.form-group{
+  width:80%;
+  margin: 20rpx 10%;
+  display: flex;
+}
+.form-group:last-child{
+  border-bottom: 1px solid #ccc;
+}
+.form-group >input{
+  width: calc( 100% - 20px );
+  padding-left: 20px;
+  height:30px;
+  border: 2px solid #fff;
+  font-size: 16px;
+  background: #fff;
+}
+.form-group .value-getValidata{
+  width:calc( 40% - 18px );
+  margin: 10px 5% 0 10%;
+}
+.form-group .value-getValidata input{
+  border-bottom: 1px solid #ccc;
+  color: #fff;
+  padding-left: 18px;
+}
+.form-group .key-getValidata{
+  width: 40%;
+  margin: 10px 0;
+  line-height:2.5;
+  text-align: center;
+  border-radius: 20px;
+  background:#FF9C35;
+  color: #fff;
+}
+
+.form-foot{
+  padding:20px 0 10px;
+  width: 100%;
+  display: flex;
+  justify-content:center; 
+  align-items:center;
+}
+.form-foot >button{
+  width:70%;
+  margin-left: 15%;
+  border-radius: 60rpx;
+  background:#FF9C35;
+}
