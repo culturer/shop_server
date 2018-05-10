@@ -35,12 +35,15 @@ func init() {
 		if ctx.Request.RequestURI != "/login" {
 			if ctx.Request.RequestURI != "/register" {
 				if ctx.Request.RequestURI != "/products" {
-					_, ok := ctx.Input.Session("uid").(int64)
-					if !ok {
-						//beego.Info(fmt.Sprintf("redirect,uid:%v", uid))
-						//ctx.Redirect(302, "/login")
-						ctx.Output.Body([]byte(`{"status":"302","msg":"请重新登陆"}`))
+					if ctx.Request.RequestURI != "/get" {
+						_, ok := ctx.Input.Session("uid").(int64)
+						if !ok {
+							//beego.Info(fmt.Sprintf("redirect,uid:%v", uid))
+							//ctx.Redirect(302, "/login")
+							ctx.Output.Body([]byte(`{"status":"302","msg":"请重新登陆"}`))
+						}
 					}
+
 				}
 
 			}

@@ -17,6 +17,8 @@ func (this *GetController) Get() {
 }
 
 func (this *GetController) Post() {
+	this.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
+	this.Ctx.Output.Header("Access-Control-Allow-Headers", "*")
 	// [options == 0  获取订单]
 	// [options == 1  获取订单项]
 	// [options == 2  获取分销商列表]
