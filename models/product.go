@@ -36,7 +36,9 @@ type TProduct struct {
 	//封面图片
 	CoverUrl string
 	//购买数量
-	BuyNum int
+	BuyNum int //方便计数
+	//购买金额
+	SumPrice float64 //方便计数
 	//是否首页轮播
 	IsCarousel int
 }
