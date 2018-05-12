@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"shop/models"
-	_ "strconv"
+	"strconv"
 	"time"
 )
 
@@ -30,13 +31,13 @@ func (this *OrderController) Post() {
 			this.confirmOrder()
 			//生成订单
 		case "createOrder":
-			beego.Info("createOrder")
+			this.createOrder()
 			//获取某个用户订单
 		case "getOrderByUser":
 			beego.Info("getOrderByUser")
 			//分页获取订单
 		case "getOrderPage":
-			beego.Info("getOrderByUser")
+			this.getOrderPage()
 			//sql分页获取订单
 		case "getOrderPageBySql":
 			beego.Info("getOrderByUser")
@@ -45,26 +46,34 @@ func (this *OrderController) Post() {
 			beego.Info("getOrderByUser")
 			//退单
 		case "cancelOrder":
-			beego.Info("getOrderByUser")
+			this.cancelOrder()
+			//评论
+		case "commentOrder":
+			this.commentOrder()
 		default:
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "没有对应处理方法", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
+			return
 
 		}
 	}
 
 }
+
+//生成session缓存确认订单 session key：confirmOrder--------------------------
 func (this *OrderController) confirmOrder() {
 
 	products := this.GetString("products")
 	if products == "" {
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少products参数", "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
+		return
 	}
 	orderParam := this.GetString("orderParam")
 	if orderParam == "" {
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少orderParam参数", "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
+		return
 	}
 	var tmpProducts []models.TProduct
 	var tmpOrder models.TOrder
@@ -79,6 +88,7 @@ func (this *OrderController) confirmOrder() {
 
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
+		return
 	}
 	//后台核算商品------------------------------------------------------
 	var modProducts []models.TProduct
@@ -89,6 +99,7 @@ func (this *OrderController) confirmOrder() {
 		if err != nil {
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
+			return
 		}
 		//数据处理
 		mod.BuyNum = item.BuyNum
@@ -106,12 +117,165 @@ func (this *OrderController) confirmOrder() {
 
 	this.Data["json"] = map[string]interface{}{"status": 200, "confirmOrder": sessionOrder, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
+	return
 
 }
 
+//生成用户订单---------------------------------------------------------
+func (this *OrderController) createOrder() {
+	var modOrder confirmOrder
+	modOrder, ok := this.GetSession("confirmOrder").(confirmOrder)
+	if !ok {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "确定订单获取失败", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	payType := this.GetString("PayType")
+	if payType == "" {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少付款方式", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//生成订单
+	modOrder.TmpOrder.PayType = payType
+	orderId, err := models.AddOrder(&modOrder.TmpOrder)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	//生成订单商品
+	for _, item := range modOrder.ModProducts {
+		var orderItem = new(models.TOrderItem)
+		orderItem.OrderId = orderId
+		orderItem.ProductId = item.Id
+		orderItem.SumNum = item.BuyNum
+		orderItem.SumPrice = item.SumPrice
+		orderItem.CreateTime = time.Now().Format("2006-01-02 15:04:05")
+		orderItem.SortId = item.SortId
+		_, err = models.AddOrderItem(orderItem)
+		if err != nil {
+			models.DelOrder(orderId)
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "订单项生成失败：" + err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+	}
+	this.DelSession("confirmOrder")
+	this.Data["json"] = map[string]interface{}{"status": 200, "msg": "添加订单成功", "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+
+}
+
+//分页获取订单列表------------------------------------------------------
+func (this *OrderController) getOrderPage() {
+	where := this.GetString("where")
+	size, _ := strconv.Atoi(this.GetString("size"))
+	index, _ := strconv.Atoi(this.GetString("index"))
+	if size == 0 || index == 0 {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "getOrderPage参数不齐", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//获取订单列表
+	orderList, count, err := models.GetOrderPage(index, size, where)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	//构造返回订单
+	var completeOrderList []completeOrder
+	for _, item := range orderList {
+		orderIntems, itemCount, _err := models.GetOrderItemPage(1, 0, fmt.Sprintf(" and order_id=%v", item.Id))
+		if _err != nil {
+			this.Data["json"] = map[string]interface{}{"status": 400, "msg": _err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+			this.ServeJSON()
+			return
+		}
+		var modCompleteOrder = completeOrder{OrderInfo: item, ItemCount: itemCount, OrderItems: orderIntems}
+		completeOrderList = append(completeOrderList, modCompleteOrder)
+
+	}
+	this.Data["json"] = map[string]interface{}{"status": 200, "count": count, "dataList": completeOrderList, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+
+}
+
+//退单-----------------------------------------------------------
+func (this *OrderController) cancelOrder() {
+	cancelComments := this.GetString("comments")
+	orderId, _ := strconv.Atoi(this.GetString("orderId"))
+
+	if cancelComments == "" {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少退单理由", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//获取订单
+	order, err := models.GetOrderById(int64(orderId))
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "找不到订单", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//修改订单为退款状态
+	order.IsCancel = true
+	order.CancelComments = cancelComments
+	models.EditOrder(order)
+	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+
+}
+
+//评论订单-----------------------------------------------------------
+func (this *OrderController) commentOrder() {
+	comments := this.GetString("comments")
+	orderId, _ := strconv.Atoi(this.GetString("orderId"))
+
+	if comments == "" {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少评论", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//获取订单
+	order, err := models.GetOrderById(int64(orderId))
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "找不到订单", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//修改订单为评论状态
+	order.IsComment = true
+	order.Comments = comments
+	models.EditOrder(order)
+	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+
+}
+
+//确定订单结构
 type confirmOrder struct {
 	ModProducts []models.TProduct
 	TmpOrder    models.TOrder
+}
+
+//返回订单列表结构
+type completeOrder struct {
+	OrderInfo  *models.TOrder
+	OrderItems []*models.TOrderItem
+	ItemCount  int
 }
 
 // func (this *OrderController) addOrder(userId int64, addressId int64, address string, payType string, realPrice float64, shouldPrice float64, priceMsg string, partnerId int64) (int64, error) {

@@ -28,49 +28,49 @@ func (this *GetController) Post() {
 	options, _ := strconv.Atoi(this.Input().Get("options"))
 	if options == 0 {
 
-		orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
-		order, err := bean.GetOrderBean(orderId)
-		if err != nil {
-			beego.Info(err.Error())
-			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取订单信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
-		}
-		this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
-		this.ServeJSON()
-		return
+		// orderId, _ := strconv.ParseInt(this.Input().Get("orderId"), 10, 64)
+		// order, err := bean.GetOrderBean(orderId)
+		// if err != nil {
+		// 	beego.Info(err.Error())
+		// 	this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取订单信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+		// 	this.ServeJSON()
+		// 	return
+		// }
+		// this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
+		// this.ServeJSON()
+		// return
 
 	}
 
 	if options == 1 {
 
-		orderItemId, _ := strconv.ParseInt(this.Input().Get("orderItemId"), 10, 64)
-		orderItem, err := bean.GetOrderItemBean(orderItemId)
-		if err != nil {
-			beego.Info(err.Error())
-			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取订单项信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
-		}
-		this.Data["json"] = map[string]interface{}{"status": 200, "orderItem": orderItem, "time": time.Now().Format("2006-01-02 15:04:05")}
-		this.ServeJSON()
-		return
+		// orderItemId, _ := strconv.ParseInt(this.Input().Get("orderItemId"), 10, 64)
+		// orderItem, err := bean.GetOrderItemBean(orderItemId)
+		// if err != nil {
+		// 	beego.Info(err.Error())
+		// 	this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取订单项信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+		// 	this.ServeJSON()
+		// 	return
+		// }
+		// this.Data["json"] = map[string]interface{}{"status": 200, "orderItem": orderItem, "time": time.Now().Format("2006-01-02 15:04:05")}
+		// this.ServeJSON()
+		// return
 
 	}
 
 	if options == 2 {
 
-		partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
-		partner, err := bean.GetPartnerBean(partnerId)
-		if err != nil {
-			beego.Info(err.Error())
-			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取分销商信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
-		}
-		this.Data["json"] = map[string]interface{}{"status": 200, "partner": partner, "time": time.Now().Format("2006-01-02 15:04:05")}
-		this.ServeJSON()
-		return
+		// partnerId, _ := strconv.ParseInt(this.Input().Get("partnerId"), 10, 64)
+		// partner, err := bean.GetPartnerBean(partnerId)
+		// if err != nil {
+		// 	beego.Info(err.Error())
+		// 	this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取分销商信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+		// 	this.ServeJSON()
+		// 	return
+		// }
+		// this.Data["json"] = map[string]interface{}{"status": 200, "partner": partner, "time": time.Now().Format("2006-01-02 15:04:05")}
+		// this.ServeJSON()
+		// return
 
 	}
 
@@ -108,17 +108,17 @@ func (this *GetController) Post() {
 
 	if options == 5 {
 
-		userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
-		user, err := bean.GetUserBean(userId)
-		if err != nil {
-			beego.Info(err.Error())
-			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取用户信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
-			this.ServeJSON()
-			return
-		}
-		this.Data["json"] = map[string]interface{}{"status": 200, "user": user, "time": time.Now().Format("2006-01-02 15:04:05")}
-		this.ServeJSON()
-		return
+		// userId, _ := strconv.ParseInt(this.Input().Get("userId"), 10, 64)
+		// user, err := bean.GetUserBean(userId)
+		// if err != nil {
+		// 	beego.Info(err.Error())
+		// 	this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取用户信息失败，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
+		// 	this.ServeJSON()
+		// 	return
+		// }
+		// this.Data["json"] = map[string]interface{}{"status": 200, "user": user, "time": time.Now().Format("2006-01-02 15:04:05")}
+		// this.ServeJSON()
+		// return
 
 	}
 

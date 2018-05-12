@@ -48,8 +48,13 @@ type TOrder struct {
 	IsCash    bool //货到付款
 	IsComment bool //评论
 	IsCancel  bool //是否退单
+
 	//客户备注
 	Remark string
+	//客户评价
+	Comments string
+	//退货原因
+	CancelComments string
 }
 
 //-------------------------------基本方法------------------------------------------
