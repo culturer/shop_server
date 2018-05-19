@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Epr首页管理</title>
+    <title>合作商采购系统</title>
 
     <meta name="viewport" content="width=device-width">
 
@@ -95,7 +95,7 @@
              submitData() {
                 // this.fullscreenLoading = true;
                  $.ajax({
-                     url: location.origin + "/login",
+                     url: location.origin + "/p_login",
                      data: {
                          pwd: this.attr_password,
                          tel: this.attr_tel,
@@ -108,7 +108,7 @@
 
                          if (e.status == "200") {
                              //var e = confirm("添加成功是否重新加载")
-                             location.href=location.origin + "/login?page=index"
+                             location.href=location.origin + "/procurement"
                          } else if (e.status == "400") {
                              alert(e.msg)
                          }

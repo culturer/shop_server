@@ -51,6 +51,14 @@ func GetPartnerById(partnerId int64) (*TPartner, error) {
 	return partner, err
 }
 
+func GetPartnerByUserId(userId int64) (*TPartner, error) {
+	partner := new(TPartner)
+	o := orm.NewOrm()
+	qs := o.QueryTable("t_partner")
+	err := qs.Filter("user_id", userId).One(partner)
+	return partner, err
+}
+
 func GetPartners(pageNo, pageSize int) ([]*TPartner, int, error) {
 	partners := make([]*TPartner, 0)
 	o := orm.NewOrm()
