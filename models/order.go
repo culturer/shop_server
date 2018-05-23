@@ -23,6 +23,10 @@ type TOrder struct {
 	AddressId int64
 	//备用收货地址
 	Address string
+	//收货人
+	Receiver string
+	//电话
+	Phone string
 	//定位
 	Position string
 	//物流状态
