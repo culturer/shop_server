@@ -139,13 +139,8 @@ func GetOrderPage(index, size int, where string) ([]*TOrder, int, error) {
 	//返回data数据
 	data := []*TOrder{}
 	dataCounts := []*TOrder{}
-	var sql string
 	//返回数据列表
-	if size == 0 {
-		sql = fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc", where)
-	} else {
-		sql = fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc limit %v offset %v", where, size, size*(index-1))
-	}
+	sql := fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc limit %v offset %v", where, size, size*(index-1))
 	_, err := ormHelper.Raw(sql).QueryRows(&data)
 	if err != nil {
 		fmt.Printf("error is %v\n", err)

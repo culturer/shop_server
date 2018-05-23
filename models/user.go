@@ -19,7 +19,7 @@ type TUser struct {
 	//第三方账号id
 	Vid string
 	//权限
-	Prov int // 0 --- 普通用户， 1 --- 管理员, 2 --- 总部用户, 3 --- 分销商
+	Prov int
 	//添加时间
 	CreateTime string
 }

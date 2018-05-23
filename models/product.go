@@ -163,23 +163,17 @@ func GetProductPageBySql(index, size int, excSql string) ([]*TProduct, int, erro
 //----------------------------扩展方法----------------------------------------
 //根据商品类别获取分页数据
 func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) ([]*TProduct, int, error) {
-
 	products := make([]*TProduct, 0)
 	o := orm.NewOrm()
 	var sql string
 	//var num int64
 	var err error
-	if pageSize == 0 {
 
-		sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where product_type_id = %v order by sort_id ", productTypeId)
+	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where product_type_id = %v %v order by sort_id  limit %v offset %v", productTypeId, where, pageSize, pageSize*(pageNo-1))
+	if productTypeId == 0 {
+		sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id where 1=1 %v order by sort_id  limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
 
-	} else {
-		sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where product_type_id = %v %v order by sort_id  limit %v offset %v", productTypeId, where, pageSize, pageSize*(pageNo-1))
-		if productTypeId == 0 {
-			sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id where 1=1 %v order by sort_id  limit %v offset %v", where, pageSize, pageSize*(pageNo-1))
-		}
 	}
-
 	_, err = o.Raw(sql).QueryRows(&products)
 
 	products1 := make([]*TProduct, 0)
