@@ -42,12 +42,13 @@ func initRouter() {
 	beego.Router("/p_login", &controllers.PLoginController{})
 	//分销商采购接口
 	beego.Router("/procurement", &controllers.ProcurementController{})
-	//获取openId
-	// beego.Router("/ope", &controllers.OpenIdController{})
+	//获取信息接口
+	beego.Router("/wxhelper", &controllers.WxHelperController{})
 }
 
 //初始化过滤器
 func initFilter() {
+	beego.InsertFilter("/*", beego.BeforeRouter, user_filter)
 	//登录过滤器
 	beego.InsertFilter("/*", beego.BeforeRouter, login_filter)
 	//供应商采购页面过滤器
@@ -90,4 +91,20 @@ func p_login_filter(ctx *context.Context) {
 		}
 	}
 
+}
+
+func user_filter(ctx *context.Context) {
+	//过滤的url表
+	fileter_url := []string{"/login", "/register", "/products", "/get", "/wxhelper"}
+	//pid --- 分销商Id
+	for i := 0; i < len(fileter_url); i++ {
+		if ctx.Request.RequestURI != fileter_url[i] {
+			_, ok := ctx.Input.Session("uid").(int64)
+			if !ok {
+				//beego.Info(fmt.Sprintf("redirect,uid:%v", uid))
+				//ctx.Redirect(302, "/login")
+				ctx.Output.Body([]byte(`{"status":"302","msg":"请重新登陆"}`))
+			}
+		}
+	}
 }

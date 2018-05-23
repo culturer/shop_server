@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>商品列表</title>
+    <title>订单列表</title>
     <link rel="stylesheet" type="text/css" href="../static/css/element.css">
     <style>
+        label {
+        font-weight:bold
+        }
         .el-header, .el-footer {
-         padding-top:1em;
+            padding-top: 1em;
         }
 
         .el-aside {
@@ -17,7 +20,6 @@
         .el-main {
             background-color: #ffffff;
             color: #333;
-           
         }
 
         body > .el-container {
@@ -27,29 +29,43 @@
         .main-contaner {
             padding: 0;
         }
+
         .el-main {
-            padding:10px;
-            overflow-y:scroll
+            padding: 10px;
+            overflow-y: scroll
         }
+
         .nav-tab {
             background-color: #E9EEF3;
         }
-         .el-tabs.el-tabs--card.el-tabs--top {
+
+        .el-tabs.el-tabs--card.el-tabs--top {
             height: 100%
         }
+
         .el-tabs__content {
-        height:calc(100% - 41px)
+            height: calc(100% - 41px)
+        }
+        /*滚动条样式设置*/
+        ::-webkit-scrollbar-track {
+            background-color: #F5F5F5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            background-color: #F5F5F5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #999;
         }
     </style>
 </head>
-
-
 <body style="margin:0;box-sizing:border-box">
-
     <div id="app">
         <el-container style="height:100vh;">
             <el-header>
-                <el-row :gutter="10">
+                <el-row type="flex" justify="center">
                     <el-col :span="16">
 
                         <el-input placeholder="请输入内容" class="input-with-select">
@@ -65,84 +81,147 @@
                             <el-button slot="append" icon="el-icon-search"></el-button>
                         </el-input>
                     </el-col>
-                   
-                    <el-col :span="8" style="text-align:right">
-                        <el-button @click="toggleSelection()">取消选择</el-button>
-                        <el-button type="warning" @click="batchDelete()">移除</el-button>
-                        <el-button type="success" @click="location.href='?page=product_add'">新增</el-button>
-                    </el-col>
+
+
+
+                    <el-button type="primary" @click="location.reload()">刷新</el-button>
+
                 </el-row>
-                
+
             </el-header>
-          
+
             <el-main class="main-contaner">
-                <template>
 
-                    <el-table :data="tableData"
-                              v-loading="loading"
-                              ref="multipleTable"
-                              style="width: 100%"
-                              @select="selectOne"
-                              @select-all="selectAll"
-                              stripe
-                              :default-sort="{prop: 'date', order: 'descending'}">
-                        <el-table-column type="selection"
-                                         prop="Id"
-                                         width="40">
-                        </el-table-column>
-                        <el-table-column prop="Name"
-                                         label="标题"
-                                         sortable
-                                         width="380">
-                        </el-table-column>
-                        <el-table-column prop="Price"
-                                         label="价格"
-                                         sortable
-                                         width="180">
-                        </el-table-column>
-                        <el-table-column prop="Count"
-                                         sortable
-                                         label="库存">
-                        </el-table-column>
-                        <el-table-column prop="Add_time"
-                                         sortable
-                                         label="时间">
-                        </el-table-column>
-                        <el-table-column prop="Operate"
-                                         sortable
-                                         label="操作">
-                            <template slot-scope="scope">
-                                <el-button @click.native.prevent="goToEditPage(scope.row.Id)"
-                                           type="text"
-                                           size="small">
-                                    编辑
-                                </el-button>
-                                <el-button @click.native.prevent="deleteProduct(scope.row.Id)"
-                                           type="text"
-                                           size="small">
-                                    移除
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </template>
-                <template>
+                <el-row type="flex" class="row-bg" justify="center">
 
-                    <div class="block">
-                        <el-pagination @size-change="handleSizeChange"
-                                       @current-change="handleCurrentChange"
-                                       :current-page="currentPage"
-                                       :page-sizes="[5, 10, 20]"
-                                       :page-size="pageSize"
-                                       layout="total, sizes, prev, pager, next, jumper"
-                                       :total="pageTotal">
-                        </el-pagination>
-                    </div>
-                </template>
+                    <!--订单状态-->
+                    <template style="float:left;">
+                        <el-tabs tab-position="left" v-model="orderStatus" @tab-click="getPageData(1,8,orderStatus,'')" style="min-height: 200px;">
+                            <el-tab-pane label="待付款" name="notPay"></el-tab-pane>
+                            <el-tab-pane label="待发货" name="notDlivery"></el-tab-pane>
+                            <el-tab-pane label="待收货" name="notSign"></el-tab-pane>
+                            <el-tab-pane label="待评价" name="notComment"></el-tab-pane>
+                            <el-tab-pane label="已签收" name="hadSign"></el-tab-pane>
+                            <el-tab-pane label="退单" name="hadCancel"></el-tab-pane>
+                        </el-tabs>
+                    </template>
+                    <el-col :span="18">
+                        <!--表格部分-->
+                        <template>
+                            <el-table :data="tableData"
+                                      v-loading="loading"
+                                      style="width: 100%"
+                                      stripe
+                                      :default-sort="{prop: 'date', order: 'descending'}">
+                                <el-table-column type="expand">
+                                    <template slot-scope="props">
+                                        <el-form label-position="left" inline class="demo-table-expand">
+                                            <el-form-item label="订单清单数量:">
+                                                <span>{{ props.row.ItemCount }}</span>
+                                            </el-form-item>
+                                            <el-form-item label="订单金额:">
+                                                <span>{{(props.row.OrderInfo.RealePrice)?props.row.OrderInfo.RealePrice: props.row.OrderInfo.ShouldPrice }}元</span>
+                                            </el-form-item>
+                                            <el-form-item label="操作:" v-if="props.row.OrderInfo.IsCancel==false&&props.row.OrderInfo.IsSign==false">
+                                                <el-row>
+                                                    <el-button v-if="props.row.OrderInfo.IsDlivery==false" @click="showDialog(props.row.OrderInfo.Id,'goDlivery')">发货</el-button>
+                                                    <el-button v-if="props.row.OrderInfo.IsDlivery==true&&props.row.OrderInfo.IsSign==false" type="primary" @click="showDialog(props.row.OrderInfo.Id,'editTranslateStatus')">编辑物流</el-button>
+                                                    <el-button v-if="props.row.OrderInfo.IsPay==false" type="success" @click="showDialog(props.row.OrderInfo.Id,'confirmPay')" disabled>确定收款</el-button>
+                                                    <el-button v-if="props.row.OrderInfo.IsSign==false&&props.row.OrderInfo.IsDlivery==true" type="info" @click="showDialog(props.row.OrderInfo.Id,'confirmSign')">确定签收</el-button>
+                                                    <el-button v-if="props.row.OrderInfo.IsCancel==false" type="warning" @click="showDialog(props.row.OrderInfo.Id,'cancelOrder')">退单</el-button>
+                                                    <el-button disabled type="success">派单</el-button>
+                                                </el-row>
+                                            </el-form-item>
+                                            
+                                            <hr />
+                                            <template v-for="orderItem in props.row.OrderItems">
+
+                                                <el-form-item label="###商品名称:" style="padding-left:2em">
+                                                    <span>{{ orderItem.Name }}</span>
+                                                </el-form-item>
+                                                <el-form-item label="数目:">
+                                                    <span>{{ orderItem.SumNum }}</span>
+                                                </el-form-item>
+                                                <el-form-item label="总价:">
+                                                    <span>{{ orderItem.SumPrice }}元</span>
+                                                </el-form-item>
+                                            </template>
+                                            <hr />
+                                            <el-form-item label="订单地址:">
+                                                <span>{{props.row.OrderInfo.Address }}</span>
+                                            </el-form-item>
+                                            <el-form-item v-if="props.row.OrderInfo.Remark!=''" label="订单备注:">
+                                                <span>{{props.row.OrderInfo.Remark }}</span>
+                                            </el-form-item>
+                                            <el-form-item v-if="props.row.OrderInfo.Comments!=''" label="订单评论:">
+                                                <span>{{props.row.OrderInfo.Comments }}</span>
+                                            </el-form-item>
+                                            <el-form-item v-if="props.row.OrderInfo.CancelComments!=''" label="退单理由:">
+                                                <span>{{props.row.OrderInfo.CancelComments }}</span>
+                                            </el-form-item>
+                                            <el-form-item v-if="props.row.OrderInfo.IsDlivery==true" label="物流状态:">
+                                                <span v-html="props.row.OrderInfo.TranslateStatus"></span>
+                                            </el-form-item>
+                                        </el-form>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="订单号"
+                                                 prop="OrderInfo.OrderNum">
+                                </el-table-column>
+                                <el-table-column label="应付金额"
+                                                 prop="OrderInfo.ShouldPrice">
+                                </el-table-column>
+                                <el-table-column label="实付金额"
+                                                 prop="OrderInfo.RealPrice">
+                                </el-table-column>
+                                <el-table-column label="下单时间"
+                                                 prop="OrderInfo.CreateTime">
+                                </el-table-column>
+                            </el-table>
+                        </template>
+
+                        <!--分页部分-->
+                        <template>
+                            <div class="block">
+                                <el-pagination @size-change="handleSizeChange"
+                                               @current-change="handleCurrentChange"
+                                               :current-page="currentPage"
+                                               :page-sizes="[5, 10, 20]"
+                                               :page-size="pageSize"
+                                               layout="total, sizes, prev, pager, next, jumper"
+                                               :total="pageTotal">
+                                </el-pagination>
+                            </div>
+                        </template>
+                    </el-col>
+
+                </el-row>
+
+
+
             </el-main>
-          
-        </el-container>
 
+        </el-container>
+        <!--打开对话框-->
+        <template>
+            <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+                <el-form :model="form"  ref="form">
+                    <el-form-item :label="dialogTitle" >
+                        <el-input type="textarea"
+                                  :rows="3"
+                                  placeholder="填写描述（确认签收可不填，如填作为用户评论）"
+                                  v-model="form.comments">
+                        </el-input>
+                    </el-form-item>
+
+
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="editOrder()">确 定</el-button>
+                </div>
+            </el-dialog>
+        </template>
     </div>
     <script type="text/javascript" src="../static/js/vue.min.js"></script>
     <script type="text/javascript" src="../static/js/element.min.js"></script>
@@ -152,68 +231,92 @@
         var vm = new Vue({
             el: '#app',
             data: {
-                selectIds:[],
+                selectIds: [],
                 tableData: "",
-                pageSize: "3",
-                pageTotal:"0",
-                currentPage:"1",
+                pageSize: 8,
+                pageTotal: 0,
+                currentPage: "1",
                 loading: true,
                 typeList: "",
-                productTypeId:0
+                productTypeId: "",
+                orderStatus: "notDlivery",//订单状态tabs
+                dialogFormVisible: false,//对话框可视性
+                dialogTitle:"",
+                form: {},//提交数据
             },
             methods: {
 
                 handleSizeChange(val) {
                     console.log(`每页 ${val} 条`);
                     this.pageSize = val
-                    getPageData(this.currentPage, this.pageSize, this.productTypeId);
+                    getPageData(this.currentPage, this.pageSize, this.orderStatus,"");
                 },
                 handleCurrentChange(val) {
                     console.log(`当前页    ${val}`);
-                    getPageData(val, this.pageSize, this.productTypeId);
+                    getPageData(val, this.pageSize, this.orderStatus,"");
                 },
-                deleteProduct(id) {
-                    var result = confirm("移除后数据不可恢复")
-                    if (result) {
-                        deleteData(id)
+                editOrder() {
+                    //提交参数
+                    var data = {}
+                    //data.act = operate
+                    //data.orderId = id
+                    //data.comments = form.comments
+                    data.act = vm.form.act
+                    data.orderId = vm.form.id
+                    data.comments = vm.form.comments
+                  
+                    $.ajax({
+                        url: location.origin + "/order",
+                        data: data,
+                        type: "post",
+                        dataType: "json",
+                        success: function (e) {
+                            if (e.status == "200") {
+                                vm.dialogFormVisible = false
+                                vm.$notify({
+                                    title: '成功',
+                                    message: '操作成功',
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    getPageData(1, 8, vm.orderStatus, "");
+                                }, 2000)
+                            }
+                            else if (e.status == "302") {
+                                alert(e.msg)
+                            }
+                            else if (e.status == "400") {
+                                alert(e.msg)
+                            }
+                        },
+                        complete: function (e) {
+                            // $("body").loader("hide")
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                        },
+                    });
+                },
+                showDialog(id,operate) {
+                    this.dialogFormVisible = true
+                    this.form.act = operate
+                    this.form.id = id
+                    //表单title
+                    if (operate == "goDlivery") {
+                        this.dialogTitle="发货"
+                    } else if (operate == "editTranslateStatus") {
+                        this.dialogTitle = "编辑物流状态"
+                    } else if (operate == "confirmSign") {
+                        this.dialogTitle = "确认买家签收"
                     }
-                    
-                },
-                goToEditPage(id) {
-                    location.href ='?page=product_edit&productId='+id
-                },
-                toggleSelection(rows) {
-                    if (rows) {
-                        rows.forEach(row => {
-                            this.$refs.multipleTable.toggleRowSelection(row);
-                        });
-                    } else {
-                        this.$refs.multipleTable.clearSelection();
+                    else if (operate == "cancelOrder") {
+                        this.dialogTitle = "退单"
                     }
                 },
-                selectOne(item, row) {
-                    if (item.length == 0) {
-                        this.selectIds = this.selectIds.filter(obj => { return obj != row.Id })
-                    } else {
-                        this.selectIds.push(row.Id)
-                    }
-                    //console.log(vm.tableData)
 
-                },
-                selectAll(items) {
-                    if (items.length == 0) {
-                        this.selectIds = []
-                    } else {
-                        for (var i = 0; i < items.length; i++) {
-                            this.selectIds.push(items[i].Id)
-                        }
-                       
-                    }
 
-                },
 
-               
-            
+
 
             },
             watch: {
@@ -223,40 +326,77 @@
             }
 
         });
-        getPageData(1,2,0);
+        getPageData(1, 8,"notDlivery", "");
         //初始化数据
-        function getPageData(pageNo, pageSize, productTypeId) {
+        function getPageData(pageNo, pageSize, where,param) {
             vm.currentPage = pageNo;
             vm.pageSize = pageSize;
+            //未付款
+            if (where == 'notPay') {
+                where = ' and is_cancel=0 and is_pay=0 '
 
+            }
+            //未发货
+            else if (where == 'notDlivery') {
+                where = ' and is_cancel=0  and is_dlivery=0 '
+            }
+            //未签收
+            else if (where == 'notSign') {
+                where = ' and is_cancel=0  and is_sign=0 and is_dlivery=1 '
+            }
+            //未评价
+            else if (where == 'notComment') {
+                where = ' and is_cancel=0 and is_comment=0 and is_sign=1 '
+            }
+            //已完成
+            else if (where == 'hadSign') {
+                where = ' and is_cancel=0 and is_sign=1 '
+            }
+            //退单
+            else if (where == 'hadCancel') {
+                where = ' and is_cancel=1 '
+            }
             $.ajax({
-                url: location.origin + "/products",
+                url: location.origin + "/order",
                 data: {
-                    types: 1,
-                    options: 0,
-                    productTypeId: productTypeId,
-                    getType: 0,
-                    pageNo: pageNo,
-                    pageSize: pageSize
+                    act: 'getOrderPage',
+                    where: where,
+                    size: pageSize,
+                    index: pageNo
 
                 },
                 type: "post",
                 dataType: "json",
                 success: function (e) {
                     if (e.status == "200") {
-                        var list = e.products;
+                        if (e.dataList==null) {
+                            var list = [];
+                        } else {
+                            var list = e.dataList;
+                        }
+                       
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)                        
+                            list[i].OrderInfo.Name = decodeURIComponent(list[i].OrderInfo.Name)
+                            list[i].OrderInfo.Remark = decodeURIComponent(list[i].OrderInfo.Remark)
+                            list[i].OrderInfo.Address = decodeURIComponent(list[i].OrderInfo.Address)
+                         
+                            for (var j = 0; j < list[i].OrderItems.length; j++) {
+                                list[i].OrderItems[j].Name = decodeURIComponent(list[i].OrderItems[j].Name)
+                            }
                         }
                         vm.tableData = list
-                        vm.pageTotal = e.totalPage
+                        vm.pageTotal = e.count
                         vm.loading = false
-                    } else if (e.status == "400") {
+                    }
+                    else if (e.status == "302") {
+                        alert(e.msg)
+                    }
+                    else if (e.status == "400") {
                         alert(e.msg)
                     }
                 },
                 complete: function (e) {
-                   // $("body").loader("hide")
+                    // $("body").loader("hide")
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("状态：" + textStatus + "；出错提示：" + errorThrown);
@@ -281,7 +421,7 @@
                         getPageData(1, vm.pageSize);
                         //vm.tableData = vm.tableData.filter(item => { return item.Id != id })
                         //vm.pageTotal = vm.tableData.length
-                       // vm.pageTotal = list.length
+                        // vm.pageTotal = list.length
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
@@ -306,11 +446,11 @@
                 }
             }
             console.log(vm.tableData)
-           
+
         }
         getTypeData(1, 0);
         //获取类型数据
-        function getTypeData(pageNo, pageSize) {          
+        function getTypeData(pageNo, pageSize) {
 
             $.ajax({
                 url: location.origin + "/products",
@@ -344,7 +484,7 @@
                 },
             });
         }
-        //
+                //
     </script>
 </body>
 </html>
