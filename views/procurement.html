@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>中恒集团采购系统</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/element.css">
+
+	<style>
+        .el-header, .el-footer {
+            color: #333;
+            text-align: center;
+        }
+
+        .el-aside {
+            /*background-color: #D3DCE6;*/
+            color: #333;
+            text-align: center;
+            min-height: 500px
+        }
+
+        .el-main {
+        	min-height: 500px;
+            /*background-color: #ffffff;*/
+            color: #333;
+            text-align: center;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+        /*---------*/
+        .main-contaner {
+            padding: 0;
+        }
+        .el-main {
+            padding:10px;
+            overflow:hidden
+        }
+        .nav-tab {
+            background-color: #E9EEF3;
+        }
+         .el-tabs.el-tabs--card.el-tabs--top {
+            height: 100%
+        }
+        .el-tabs__content {
+        height:calc(100% - 41px)
+        }
+    </style>	
+	
+</head>
+<body style="margin:0;box-sizing:border-box">
+
+	<div id="app">
+		<el-container>
+
+		  <el-header  align="right">
+		  	<el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"@select="handleSelect" >
+			  <el-menu-item index="1">采购商品</el-menu-item>
+			  <el-menu-item index="2">采购清单</el-menu-item>
+			  <el-menu-item index="3">订单管理</el-menu-item>
+			</el-menu>
+		</el-header>
+
+		  <el-container>
+		    <el-aside width="200px">
+		    	<el-menu
+			      default-active="1"
+			      class="el-menu-vertical-demo"
+			      @open="handleOpen"
+			      @close="handleClose">
+			      <el-menu-item index="1">
+			        <i class="el-icon-location"></i>
+			        <span slot="title">导航一</span>
+			      </el-menu-item>
+			      <el-menu-item index="2">
+			        <i class="el-icon-menu"></i>
+			        <span slot="title">导航二</span>
+			      </el-menu-item>
+			      <el-menu-item index="3" >
+			        <i class="el-icon-document"></i>
+			        <span slot="title">导航三</span>
+			      </el-menu-item>
+			      <el-menu-item index="4">
+			        <i class="el-icon-setting"></i>
+			        <span slot="title">导航四</span>
+			      </el-menu-item>
+			    </el-menu>
+		    </el-aside>
+		    <el-container>
+		      <el-main>
+		      	<template style="height:100%">
+                         <label>this is main !!!</label>               
+                    <!-- <iframe v-bind:src="127.0.0.1:8080/products?page=product_list" style="width:100%;height:100%;border:none" ></iframe> -->
+                                     
+                </template>
+		      </el-main>
+<!-- 		      <el-footer>
+		      	底部导航栏
+		      </el-footer> -->
+		    </el-container>
+		  </el-container>
+		</el-container>
+	</div>
+
+	<script type="text/javascript" src="../static/js/vue.min.js"></script>
+	<script type="text/javascript" src="../static/js/element.min.js"></script>
+	<script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
+
+	<script type="text/javascript">
+		var vm = new Vue({
+			el: '#app',
+            data: {
+            	msg:0,
+            	activeIndex: '1',
+			    activeIndex2: '1'
+            },
+            methods: {
+			      handleSelect(key, keyPath) {
+			        console.log(key, keyPath);
+			      },
+			       handleOpen(key, keyPath) {
+			        console.log(key, keyPath);
+			      },
+			      handleClose(key, keyPath) {
+			        console.log(key, keyPath);
+			      }
+			    }
+		})
+	</script>
+
+</body>
+
+
+</html>
