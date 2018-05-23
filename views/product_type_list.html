@@ -93,15 +93,6 @@
                                          sortable
                                          width="380">
                         </el-table-column>
-                        <el-table-column prop="Icon"
-                                         label="图标"
-                                         sortable
-                                         width="380">
-                            <template slot-scope="scopeIcon">
-                                <img :src="scopeIcon.row.Icon" style="height:50px;width:auto"/>
-                            </template>
-                            
-                        </el-table-column>
                         <el-table-column prop="SortId"
                                          label="排序"
                                          sortable
@@ -146,7 +137,6 @@
             </el-main>
 
         </el-container>
-        <!--打开对话框-->
         <el-dialog title="新增分类"
                    :visible.sync="dialogVisible"
                    width="30%"
@@ -156,20 +146,7 @@
                     <el-input v-model="form.TypeName"></el-input>
                 </el-form-item>
                 <el-form-item label="排序id">
-                    <el-input-number v-model="form.SortId" controls-position="right" :min="0"></el-input-number>
-                </el-form-item>
-                <el-form-item label="封面图片" >
-                    <el-col :span="11">
-                        <el-upload class="avatar-uploader"
-                                   action="#"
-                                   :show-file-list="false"
-                                   :on-success="handleAvatarSuccess"
-                                   :before-upload="beforeAvatarUpload">
-                            <img v-if="imageUrl" :src="imageUrl" style="height:auto;max-height:200px;width:auto;max-width:200px">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </el-col>
-               
+                    <el-input-number v-model="form.SortId" controls-position="right" :min="0" ></el-input-number>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -197,8 +174,7 @@
                     TypeName: "",
                     SortId: "",
                     Id: 0,
-                },
-                imageUrl:""
+                }
 
             },
             methods: {
@@ -260,38 +236,7 @@
                         submitData()
                     }
                   
-                },
-                //封面上传部分
-                handleAvatarSuccess(res, file) {
-                    //上传图片后自动修改表单中的cover
-                    //uploadImage(file.raw);
-                    this.form.attachment = file.raw
-                    //读取缓存图片
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        //options.imgSrc = e.target.result;
-                        vm.imageUrl=e.target.result
-                    }
-                    
-                    reader.readAsDataURL(file.raw);
-                    
-                },
-                beforeAvatarUpload(file) {
-                    const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png');
-
-                    const isLt2M = file.size / 1024 / 1024 < 2;
-
-                    if (!isJPG) {
-                        this.$message.error('上传头像图片只能是 JPG,png 格式!');
-                    }
-                    if (!isLt2M) {
-                        this.$message.error('上传头像图片大小不能超过 2MB!');
-                    }
-                    //this.abort(file)
-                 
-
-                    return isJPG && isLt2M;
-                },
+                }
 
 
 
@@ -385,105 +330,62 @@
         }
         //新增数据
         function submitData() {
-            var formdata = new FormData();
-            formdata.append("attachment", vm.form.attachment, new Date().getTime() + '.png');
-            formdata.append("SortId", vm.form.SortId)
-            formdata.append("TypeName", encodeURIComponent(vm.form.TypeName))
-            formdata.append("types", 0)
-            formdata.append("options", 1)
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", location.origin + "/products");
-            oReq.send(formdata);
-            oReq.onreadystatechange = function () {
-                if (oReq.readyState == 4 && oReq.status == 200) {
-                    console.log(oReq.responseText)
-                    var e = JSON.parse(oReq.responseText)
+            $.ajax({
+                url: location.origin + "/products",
+                data: {
+                    types: 0,
+                    options: 1,
+                    TypeName: encodeURIComponent(vm.form.TypeName),
+                    SortId: vm.form.SortId
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
                     if (e.status == "200") {
                         getPageData(1, vm.pageSize);
-                        vm.dialogVisible = false
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
-                }
-            }
-            //$.ajax({
-            //    url: location.origin + "/products",
-            //    data: {
-            //        types: 0,
-            //        options: 1,
-            //        TypeName: encodeURIComponent(vm.form.TypeName),
-            //        SortId: vm.form.SortId
-            //    },
-            //    type: "post",
-            //    dataType: "json",
-            //    success: function (e) {
-
-            //        if (e.status == "200") {
-            //            getPageData(1, vm.pageSize);
-            //        } else if (e.status == "400") {
-            //            alert(e.msg)
-            //        }
-            //    },
-            //    complete: function (e) {
-            //        vm.dialogVisible = false
-            //    },
-            //    error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //        alert("状态：" + textStatus + "；出错提示：" + errorThrown);
-            //    },
-            //});
-
+                },
+                complete: function (e) {
+                    vm.dialogVisible = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
         }
         //修改数据
         function editData(id) {
-            var formdata = new FormData();
-            formdata.append("attachment", vm.form.attachment, new Date().getTime() + '.png');
-            formdata.append("SortId", vm.form.SortId)
-            formdata.append("TypeName", encodeURIComponent(vm.form.TypeName))
-            formdata.append("types", 0)
-            formdata.append("options", 3)
-            formdata.append("productTypeId", id)
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", location.origin + "/products");
-            oReq.send(formdata);
-            oReq.onreadystatechange = function () {
-                if (oReq.readyState == 4 && oReq.status == 200) {
-                    console.log(oReq.responseText)
-                    var e = JSON.parse(oReq.responseText)
+           
+            $.ajax({
+                url: location.origin + "/products",
+                data: {
+                    types: 0,
+                    options: 3,
+                  
+                    TypeName: decodeURIComponent(vm.form.TypeName),
+                    SortId: vm.form.SortId,
+                    Id:id
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
                     if (e.status == "200") {
                         getPageData(1, vm.pageSize);
-                        vm.dialogVisible = false
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
-                }
-            }
-            //$.ajax({
-            //    url: location.origin + "/products",
-            //    data: {
-            //        types: 0,
-            //        options: 3,
-                  
-            //        TypeName: decodeURIComponent(vm.form.TypeName),
-            //        SortId: vm.form.SortId,
-            //        Id:id
-            //    },
-            //    type: "post",
-            //    dataType: "json",
-            //    success: function (e) {
-
-            //        if (e.status == "200") {
-            //            getPageData(1, vm.pageSize);
-            //        } else if (e.status == "400") {
-            //            alert(e.msg)
-            //        }
-            //    },
-            //    complete: function (e) {
-            //        vm.dialogVisible = false
-            //    },
-            //    error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //        alert("状态：" + textStatus + "；出错提示：" + errorThrown);
-            //    },
-            //});
+                },
+                complete: function (e) {
+                    vm.dialogVisible = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
         }
     </script>
 </body>

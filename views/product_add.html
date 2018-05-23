@@ -41,15 +41,14 @@
 
         </div>
         <div class="form-group">
-            <div class="row">
+            <div class="row">               
                 <div class="col-sm-4">
-                    <select required id="attr_productTypeId" class="form-control"></select>
+                    <select required id="attr_productTypeId"  class="form-control">
+                       
+                    </select>
                 </div>
                 <div class="col-sm-4">
-                    <label>是否首页轮播</label><input style="margin:5px" type="checkbox" id="attr_is_carousel" />
-                </div>
-                <div class="col-sm-4">
-                    <label>是否热推荐</label><input style="margin:5px" type="checkbox" id="attr_is_hot" />
+                   <label>是否首页轮播</label><input style="margin:5px" type="checkbox" id="attr_is_carousel"/>
                 </div>
             </div>
 
@@ -143,7 +142,6 @@
                     StandardPrice: $("#attr_standardPrice").val(),
                     Msg: encodeURIComponent( $("#attr_msg").val()), 
                     IsCarousel: ($("#attr_is_carousel").is(":checked")) ? 1 : 0,
-                    IsHot: ($("#attr_is_hot").is(":checked")) ? 1 : 0,
                     SortId: $("#attr_sort_id").val()
                 },
                 type: "post",
@@ -207,8 +205,8 @@
             var img = new Image()
             img.src = src;
             canvas = document.createElement("canvas")
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = img.width
+            canvas.height = img.height
             var context = canvas.getContext("2d");
             context.drawImage(img,0,0);
             var imageData = canvas.toDataURL('image/png');

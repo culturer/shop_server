@@ -23,10 +23,6 @@ type TOrder struct {
 	AddressId int64
 	//备用收货地址
 	Address string
-	//收货人
-	Receiver string
-	//电话
-	Phone string
 	//定位
 	Position string
 	//物流状态
@@ -139,8 +135,13 @@ func GetOrderPage(index, size int, where string) ([]*TOrder, int, error) {
 	//返回data数据
 	data := []*TOrder{}
 	dataCounts := []*TOrder{}
+	var sql string
 	//返回数据列表
-	sql := fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc limit %v offset %v", where, size, size*(index-1))
+	if size == 0 {
+		sql = fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc", where)
+	} else {
+		sql = fmt.Sprintf("select * from t_order where 1=1  %v  order by id desc limit %v offset %v", where, size, size*(index-1))
+	}
 	_, err := ormHelper.Raw(sql).QueryRows(&data)
 	if err != nil {
 		fmt.Printf("error is %v\n", err)

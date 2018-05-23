@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"os"
-	"path"
 	"shop/models"
 	"strconv"
 	"time"
@@ -66,40 +64,8 @@ func (this *ProductController) Post() {
 		if options == 1 {
 			// sortId, _ := strconv.ParseInt(this.Input().Get("sortId"), 10, 64)
 			// typeName := this.Input().Get("typeName")
-			//创建用户目录
-			err := os.MkdirAll("pictures/typeicon", os.ModePerm)
-			if err != nil {
-				beego.Error(err)
-			}
-			// 获取附件
-			_, fh, ee := this.GetFile("attachment")
-			if ee != nil {
-				beego.Error(ee)
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": ee.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
-			var attachment, icon string
-			if fh != nil {
-				//保存附件
-				attachment = fh.Filename
-				beego.Info(attachment)
-				myPath := path.Join("pictures/typeicon", attachment)
-				beego.Info(myPath)
-				err := this.SaveToFile("attachment", myPath)
-
-				if err != nil {
-					beego.Error(err)
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				icon = myPath
-
-			}
 			productType := new(models.TProductType)
 			this.ParseForm(productType)
-			productType.Icon = icon
 			productTypeId, err := this.addProductType(productType)
 			if err != nil {
 				beego.Info(err.Error())
@@ -130,33 +96,7 @@ func (this *ProductController) Post() {
 		if options == 3 {
 			productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
 			productType, _ := models.GetProductTypeById(productTypeId)
-			// 获取附件
-			_, fh, ee := this.GetFile("attachment")
-			if ee != nil {
-				beego.Error(ee)
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": ee.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
-				this.ServeJSON()
-				return
-			}
-			var attachment, icon string
-			if fh != nil {
-				//保存附件
-				attachment = fh.Filename
-				beego.Info(attachment)
-				myPath := path.Join("pictures/typeicon", attachment)
-				beego.Info(myPath)
-				err := this.SaveToFile("attachment", myPath)
 
-				if err != nil {
-					beego.Error(err)
-					this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
-					this.ServeJSON()
-					return
-				}
-				icon = myPath
-
-			}
-			productType.Icon = icon
 			this.ParseForm(productType)
 			//util.formToModel(obj interface{},ctx *context)
 			_, err := models.EditProductType(productType)

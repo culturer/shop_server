@@ -19,8 +19,6 @@ type TProductType struct {
 	CreateTime string
 	//排序权重
 	SortId int64
-	//图标
-	Icon string
 }
 
 //-------------------------------基本方法------------------------------------------
