@@ -35,6 +35,10 @@ type TOrder struct {
 	ShouldPrice float64
 	//金额注释
 	PriceMsg string
+	//收货人
+	Receiver string
+	//电话
+	Phone string
 	//分销商
 	PartnerId int64
 	//下单时间
