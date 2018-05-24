@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"shop/models"
+	"strconv"
 	"time"
 )
 
@@ -27,6 +28,8 @@ func (this *RegisterController) Post() {
 	tel := this.Input().Get("tel")
 	vid := this.Input().Get("vid")
 	name := this.Input().Get("name")
+	prov, _ := strconv.Atoi(this.Input().Get("prov"))
+
 	//判断该手机号是否已经注册
 	user, err := this.getUser(tel)
 	if user.Id != 0 {
@@ -41,7 +44,7 @@ func (this *RegisterController) Post() {
 	}
 
 	//注册用户
-	userId, err := this.addUser(tel, pwd, name, vid)
+	userId, err := this.addUser(tel, pwd, name, vid, prov)
 	if err != nil {
 		beego.Error(err)
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "register fail -- add user fail ", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -56,9 +59,9 @@ func (this *RegisterController) Post() {
 }
 
 //新建User
-func (this *RegisterController) addUser(tel string, password, name string, vid string) (int64, error) {
+func (this *RegisterController) addUser(tel string, password, name string, vid string, prov int) (int64, error) {
 
-	userId, err := models.AddUser(tel, password, name, vid)
+	userId, err := models.AddUser(tel, password, name, vid, prov)
 	return userId, err
 
 }

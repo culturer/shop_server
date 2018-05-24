@@ -52,9 +52,9 @@ func GetUserByVId(vid string) (*TUser, error) {
 }
 
 //新建用户
-func AddUser(tel string, password, name string, vid string) (int64, error) {
+func AddUser(tel string, password, name string, vid string, prov int) (int64, error) {
 	o := orm.NewOrm()
-	user := &TUser{Password: password, Tel: tel, Prov: 0, Name: name, Vid: vid, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
+	user := &TUser{Password: password, Tel: tel, Prov: prov, Name: name, Vid: vid, CreateTime: time.Now().Format("2006-01-02 15:04:05")}
 	userId, err := o.Insert(user)
 	return userId, err
 }
