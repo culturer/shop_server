@@ -15,9 +15,11 @@ type TOrder struct {
 	Id int64
 	//订单号
 	OrderNum string
-	//用户Id
-	SortId int
+	//订单类型 	OrderType == 0 普通订单 ; OrderType == 1 合作商订单 ;
+	OrderType int
 	//排序权重
+	SortId int
+	//用户Id
 	UserId int64
 	// //地址Id
 	AddressId int64

@@ -26,7 +26,7 @@ func (this *RegisterController) Post() {
 	//获取数据信息
 	pwd := this.Input().Get("pwd")
 	tel := this.Input().Get("tel")
-	vid := this.Input().Get("vid")
+	vid := this.Input().Get("vId")
 	name := this.Input().Get("name")
 	prov, _ := strconv.Atoi(this.Input().Get("prov"))
 

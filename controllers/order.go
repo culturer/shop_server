@@ -79,6 +79,8 @@ func (this *OrderController) Post() {
 //生成session缓存确认订单 session key：confirmOrder--------------------------
 func (this *OrderController) confirmOrder() {
 
+	orderType, _ := strconv.Atoi(this.Input().Get("orderType"))
+
 	products := this.GetString("products")
 	if products == "" {
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "缺少products参数", "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -119,7 +121,12 @@ func (this *OrderController) confirmOrder() {
 		}
 		//数据处理
 		mod.BuyNum = item.BuyNum
-		mod.SumPrice = float64(mod.BuyNum) * mod.Price
+		if orderType == 1 {
+			mod.SumPrice = float64(mod.BuyNum) * mod.StandardPrice
+		} else {
+			mod.SumPrice = float64(mod.BuyNum) * mod.Price
+		}
+
 		//添加到已处理的商品中
 		modProducts = append(modProducts, *mod)
 		payMoney += mod.SumPrice

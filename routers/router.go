@@ -76,7 +76,7 @@ func initFilter() {
 func login_filter(ctx *context.Context) {
 
 	//不过滤的url表
-	n_fileter_url := []string{"/login", "/register", "/products", "/get", "/procurement", "/p_login", "/wxhelper"}
+	n_fileter_url := []string{"/partner", "/login", "/register", "/products", "/get", "/procurement", "/p_login", "/wxhelper"}
 
 	for i := 0; i < len(n_fileter_url); i++ {
 		if ctx.Request.RequestURI == n_fileter_url[i] {

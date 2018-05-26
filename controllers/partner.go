@@ -27,6 +27,7 @@ func (this *PartnerController) Post() {
 	// [options == 1  增加]
 	// [options == 2  删除]
 	// [options == 3  修改]
+
 	options, _ := strconv.Atoi(this.Input().Get("options"))
 
 	if options == 0 {
