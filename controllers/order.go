@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"net/url"
 	"shop/models"
 	"strconv"
 	"time"
@@ -289,7 +290,7 @@ func (this *OrderController) cancelOrder() {
 
 	//修改订单为退款状态
 	order.IsCancel = true
-	order.CancelComments = fmt.Sprintf("时间:%v \n %v", time.Now().Format("2006-01-02 15:04:05"), cancelComments)
+	order.CancelComments = url.QueryEscape(fmt.Sprintf("时间:%v \n %v", time.Now().Format("2006-01-02 15:04:05"), cancelComments))
 	models.EditOrder(order)
 	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
@@ -318,7 +319,7 @@ func (this *OrderController) commentOrder() {
 
 	//修改订单为评论状态
 	order.IsComment = true
-	order.Comments = fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments)
+	order.Comments = url.QueryEscape(fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments))
 	models.EditOrder(order)
 	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
@@ -348,7 +349,7 @@ func (this *OrderController) goDlivery() {
 
 	//修改订单为发货状态
 	order.IsDlivery = true
-	order.TranslateStatus = fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments)
+	order.TranslateStatus = url.QueryEscape(fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments))
 	models.EditOrder(order)
 	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
@@ -378,7 +379,7 @@ func (this *OrderController) editTranslateStatus() {
 
 	//修改物流状态
 
-	order.TranslateStatus += fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments)
+	order.TranslateStatus += url.QueryEscape(fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments))
 	models.EditOrder(order)
 	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
@@ -404,7 +405,7 @@ func (this *OrderController) confirmSign() {
 	order.IsSign = true
 	if comments != "" {
 		order.IsComment = true
-		order.Comments = fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments)
+		order.Comments = url.QueryEscape(fmt.Sprintf("时间:%v \n <br/> %v \n <br/>", time.Now().Format("2006-01-02 15:04:05"), comments))
 
 	}
 	models.EditOrder(order)
