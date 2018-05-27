@@ -96,7 +96,7 @@ func (this *LoginController) Post() {
 			return
 		}
 		user, err := this.getUserByVid(vid)
-		if err != nil || user == nil || user.Tel == "" || user.Password == "" {
+		if err != nil || user == nil {
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 登录失败，vid参数错误，请检查后重写登录！", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
 			return
@@ -131,5 +131,11 @@ func (this *LoginController) getUser(tel string) (*models.TUser, error) {
 
 func (this *LoginController) getUserByVid(vid string) (*models.TUser, error) {
 	user, err := models.GetUserByVId(vid)
+	if user.Id == 0 {
+
+		models.AddUser("", "", "", vid, int(0))
+		user, err = models.GetUserByVId(vid)
+	}
+	beego.Info(user)
 	return user, err
 }

@@ -54,7 +54,7 @@ type TOrder struct {
 	IsCash    bool //货到付款
 	IsComment bool //评论
 	IsCancel  bool //是否退单
-	Isrefund  bool //是否已退款。iscancel=1有效
+	IsRefund  bool //是否已退款。iscancel=1有效
 	//客户备注
 	Remark string
 	//客户评价

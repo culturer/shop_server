@@ -379,9 +379,15 @@
                             list[i].OrderInfo.Name = decodeURIComponent(list[i].OrderInfo.Name)
                             list[i].OrderInfo.Remark = decodeURIComponent(list[i].OrderInfo.Remark)
                             list[i].OrderInfo.Address = decodeURIComponent(list[i].OrderInfo.Address)
-                         
+                            list[i].OrderInfo.TranslateStatus = decodeURIComponent(list[i].OrderInfo.TranslateStatus).replace(/\+/g,"&nbsp;")
+                            //for (var key in list[i].OrderInfo) {
+                            //    list[i].OrderInfo[key] = decodeURIComponent(list[i].OrderInfo[key])
+                            //}
                             for (var j = 0; j < list[i].OrderItems.length; j++) {
-                                list[i].OrderItems[j].Name = decodeURIComponent(list[i].OrderItems[j].Name)
+                                for (var key in list[i].OrderItems[j]) {
+                                    list[i].OrderItems[j][key] = decodeURIComponent(list[i].OrderItems[j][key])
+                                }
+                               
                             }
                         }
                         vm.tableData = list
