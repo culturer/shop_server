@@ -387,7 +387,8 @@
                             list[i].OrderInfo.Name = decodeURIComponent(list[i].OrderInfo.Name)
                             list[i].OrderInfo.Remark = decodeURIComponent(list[i].OrderInfo.Remark)
                             list[i].OrderInfo.Address = decodeURIComponent(list[i].OrderInfo.Address)
-                            list[i].OrderInfo.TranslateStatus = decodeURIComponent(list[i].OrderInfo.TranslateStatus).replace(/\+/g,"&nbsp;")
+                            list[i].OrderInfo.TranslateStatus = decodeURIComponent(list[i].OrderInfo.TranslateStatus).replace(/\+/g, "&nbsp;")
+                            list[i].OrderInfo.Comments = decodeURIComponent(list[i].OrderInfo.Comments).replace(/\+/g, "&nbsp;")
                             //for (var key in list[i].OrderInfo) {
                             //    list[i].OrderInfo[key] = decodeURIComponent(list[i].OrderInfo[key])
                             //}
