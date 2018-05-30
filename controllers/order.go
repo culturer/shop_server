@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	_ "io/ioutil"
+	_ "net/http"
 	"net/url"
 	"shop/models"
 	"strconv"
@@ -67,6 +69,9 @@ func (this *OrderController) Post() {
 			//确定签收
 		case "confirmSign":
 			this.confirmSign()
+			//确定签收
+		case "confirmPay":
+			this.confirmPay()
 		default:
 			this.Data["json"] = map[string]interface{}{"status": 400, "msg": "没有对应处理方法", "time": time.Now().Format("2006-01-02 15:04:05")}
 			this.ServeJSON()
@@ -135,6 +140,7 @@ func (this *OrderController) confirmOrder() {
 	}
 	//订单处理--------------------------------------------------------
 	tmpOrder.ShouldPrice = payMoney
+	tmpOrder.RealPrice = payMoney
 	tmpOrder.CreateTime = time.Now().Format("2006-01-02 15:04:05")
 	var sessionOrder = confirmOrder{ModProducts: modProducts, TmpOrder: tmpOrder}
 	this.SetSession("confirmOrder", sessionOrder)
@@ -164,6 +170,9 @@ func (this *OrderController) createOrder() {
 
 	//生成订单
 	modOrder.TmpOrder.PayType = payType
+	if payType == "wxPay" {
+		modOrder.TmpOrder.IsPay = true
+	}
 	orderId, err := models.AddOrder(&modOrder.TmpOrder)
 	if err != nil {
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
@@ -414,6 +423,91 @@ func (this *OrderController) confirmSign() {
 	return
 
 }
+
+//确定付款
+func (this *OrderController) confirmPay() {
+
+	RealPrice := this.GetString("RealPrice")
+	orderId, _ := strconv.Atoi(this.GetString("orderId"))
+	if RealPrice == "" {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "请填写收款金额", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//获取订单
+	order, err := models.GetOrderById(int64(orderId))
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": "找不到订单", "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+
+	//修改订单状态
+	order.IsPay = true
+	order.RealPrice, _ = strconv.ParseFloat(RealPrice, 64)
+
+	models.EditOrder(order)
+	this.Data["json"] = map[string]interface{}{"status": 200, "order": order, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+
+}
+
+// //发起支付---------------------------------------------------------
+// func goPay(appid, secret, js_code, grant_type, mch_id, spbill_create_ip string, tmpOrder models.TOrder) bool {
+// 	//获取openid 参数
+
+// 	resp, err := http.Get(fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%v&secret=%v&js_code=%v&grant_type=%v", appid, secret, js_code, grant_type))
+// 	if err != nil {
+// 		beego.Info(err)
+// 		return false
+// 	}
+// 	defer resp.Body.Close()
+// 	body, err := ioutil.ReadAll(resp.Body)
+// 	//openid 结构体
+// 	var openOBJ = new(openidObject)
+// 	err = json.Unmarshal([]byte(body), &openOBJ)
+// 	beego.Info(openOBJ)
+// 	//-----------构造下单数据-----------------------------
+// 	out_trade_no := tmpOrder.OrderNum
+// 	total_fee := int(tmpOrder.RealPrice * 100)
+// 	wxOrderOBJ := wxOrder{total_fee: total_fee, spbill_create_ip: spbill_create_ip, appid: appid, mch_id: mch_id, nonce_str: time.Now().Format("2006010215040500"), body: "小程序购物", out_trade_no: out_trade_no, notify_url: "https://mushangyun.com/wxhelper", trade_type: "JSAPI", openid: openOBJ.Openid}
+// 	beego.Info(wxOrderOBJ)
+// 	//发起下单请求
+// 	// resp, err = http.Get(fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%v&secret=%v&js_code=%v&grant_type=%v", appid, secret, js_code, grant_type))
+// 	// if err != nil {
+// 	// 	beego.Info(err)
+// 	// 	return false
+// 	// }
+// 	// defer resp.Body.Close()
+// 	// body, err = ioutil.ReadAll(resp.Body)
+// 	// beego.Info(fmt.Sprintf(":::::::::::::%v", string(body)))
+
+// 	return true
+
+// }
+
+// //下单结构体
+// type wxOrder struct {
+// 	appid            string
+// 	mch_id           string
+// 	nonce_str        string
+// 	sign             string
+// 	body             string //商品描述
+// 	out_trade_no     string //商户订单号
+// 	total_fee        int    //订单金额，单位分
+// 	spbill_create_ip string //小程序ip地址
+// 	notify_url       string //回调接受订单结果地址
+// 	trade_type       string //值JSAPI
+// 	openid           string
+// }
+
+// //openid 机构体
+// type openidObject struct {
+// 	Session_key string
+// 	Openid      string
+// }
 
 //确定订单结构
 type confirmOrder struct {

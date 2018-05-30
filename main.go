@@ -20,6 +20,7 @@ func main() {
 	//创建附件目录
 	os.Mkdir("pictures", os.ModePerm)
 	beego.SetStaticPath("pictures", "pictures")
+	beego.SetStaticPath("/", "root")
 	beego.BConfig.WebConfig.Session.SessionOn = true
 	beego.BConfig.WebConfig.TemplateLeft = "[["
 	beego.BConfig.WebConfig.TemplateRight = "]]"

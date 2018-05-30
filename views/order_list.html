@@ -126,7 +126,7 @@
                                                 <el-row>
                                                     <el-button v-if="props.row.OrderInfo.IsDlivery==false" @click="showDialog(props.row.OrderInfo.Id,'goDlivery')">发货</el-button>
                                                     <el-button v-if="props.row.OrderInfo.IsDlivery==true&&props.row.OrderInfo.IsSign==false" type="primary" @click="showDialog(props.row.OrderInfo.Id,'editTranslateStatus')">编辑物流</el-button>
-                                                    <el-button v-if="props.row.OrderInfo.IsPay==false" type="success" @click="showDialog(props.row.OrderInfo.Id,'confirmPay')" disabled>确定收款</el-button>
+                                                    <el-button v-if="props.row.OrderInfo.IsPay==false" type="success" @click="showDialog(props.row.OrderInfo.Id,'confirmPay')">确定收款</el-button>
                                                     <el-button v-if="props.row.OrderInfo.IsSign==false&&props.row.OrderInfo.IsDlivery==true" type="info" @click="showDialog(props.row.OrderInfo.Id,'confirmSign')">确定签收</el-button>
                                                     <el-button v-if="props.row.OrderInfo.IsCancel==false" type="warning" @click="showDialog(props.row.OrderInfo.Id,'cancelOrder')">退单</el-button>
                                                     <el-button disabled type="success">派单</el-button>
@@ -206,11 +206,16 @@
         <template>
             <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
                 <el-form :model="form"  ref="form">
-                    <el-form-item :label="dialogTitle" >
-                        <el-input type="textarea"
+                    <el-form-item :label="dialogTitle">
+                        <el-input v-if="form.act!='confirmPay'" type="textarea"
                                   :rows="3"
                                   placeholder="填写描述（确认签收可不填，如填作为用户评论）"
                                   v-model="form.comments">
+                        </el-input>
+                        <el-input v-else type="text"
+                                 
+                                  placeholder="填写确认收到的金额"
+                                  v-model="form.RealPrice">
                         </el-input>
                     </el-form-item>
 
@@ -264,7 +269,7 @@
                     data.act = vm.form.act
                     data.orderId = vm.form.id
                     data.comments = vm.form.comments
-                  
+                    data.RealPrice = vm.form.RealPrice
                     $.ajax({
                         url: location.origin + "/order",
                         data: data,
@@ -311,6 +316,9 @@
                     }
                     else if (operate == "cancelOrder") {
                         this.dialogTitle = "退单"
+                    }
+                    else if (operate == "confirmPay") {
+                        this.dialogTitle = "确认收款"
                     }
                 },
 

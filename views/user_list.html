@@ -109,7 +109,7 @@
                             <template slot-scope="scope">
                                 <el-button @click.native.prevent="editOne(scope.row.Id)"
                                            type="text"
-                                           size="small">
+                                           size="small" disabled>
                                     编辑
                                 </el-button>
                                 <el-button @click.native.prevent="deleteProduct(scope.row.Id)"
@@ -235,7 +235,7 @@
             }
 
         });
-        getPageData(1, 2);
+        getPageData(1, 10);
         //初始化数据
         function getPageData(pageNo, pageSize) {
             vm.currentPage = pageNo;

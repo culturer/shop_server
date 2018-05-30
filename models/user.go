@@ -130,6 +130,7 @@ func GetUserPage(pageNo, pageSize int, where string) ([]*TUser, int, error) {
 
 	} else {
 		sql = fmt.Sprintf("select * from t_user  order by id  limit %v offset %v", pageSize, pageSize*(pageNo-1))
+		sqlCount = "select * from t_user "
 		if pageSize == 0 {
 			sql = "select * from t_user  order by id "
 			sqlCount = "select * from t_user "
