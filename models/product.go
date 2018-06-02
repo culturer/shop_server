@@ -43,6 +43,12 @@ type TProduct struct {
 	IsCarousel int
 	//是否首页轮播
 	IsHot int
+	//特色商品
+	IsTeShe bool
+	//特价商品
+	IsTeJia bool
+	//限时抢购
+	IsQiangGou bool
 }
 
 //-------------------------------基本方法------------------------------------------
@@ -200,6 +206,53 @@ func GetProductByType(productTypeId int64, pageNo, pageSize int, where string) (
 	beego.Info(sql)
 	return products, int(totalNum), err
 }
+
+func GetTeShe() ([]*TProduct, error) {
+	products := make([]*TProduct, 0)
+	o := orm.NewOrm()
+	var sql string
+	//var num int64
+	var err error
+
+	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where is_te_she = 1 order by sort_id ")
+
+	_, err = o.Raw(sql).QueryRows(&products)
+
+	beego.Info(sql)
+	return products, err
+
+}
+
+func GetTejia() ([]*TProduct, error) {
+	products := make([]*TProduct, 0)
+	o := orm.NewOrm()
+	var sql string
+	//var num int64
+	var err error
+
+	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where is_te_jia = 1 order by sort_id ")
+
+	_, err = o.Raw(sql).QueryRows(&products)
+
+	beego.Info(sql)
+	return products, err
+}
+
+func GetQiangGou() ([]*TProduct, error) {
+	products := make([]*TProduct, 0)
+	o := orm.NewOrm()
+	var sql string
+	//var num int64
+	var err error
+
+	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where is_qiang_gou = 1 order by sort_id ")
+
+	_, err = o.Raw(sql).QueryRows(&products)
+
+	beego.Info(sql)
+	return products, err
+}
+
 func MdfyType(productId int64, productTypeId int64) error {
 	product, err := GetProductById(productId)
 	if err != nil {

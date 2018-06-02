@@ -220,6 +220,9 @@ func (this *ProductController) Post() {
 			getType, _ := strconv.Atoi(this.Input().Get("getType"))
 			// [getType == 0 获取商品列表]
 			// [getType == 1 获取指定商品]
+			// [getType == 2 获取特色商品]
+			// [getType == 3 获取特价商品]
+			// [getType == 4 获取抢购商品]
 
 			if getType == 0 {
 				productTypeId, _ := strconv.ParseInt(this.Input().Get("productTypeId"), 10, 64)
@@ -254,7 +257,48 @@ func (this *ProductController) Post() {
 				this.ServeJSON()
 				return
 			}
-
+			if getType == 2 {
+				// [getType == 2 获取特色商品]
+				products, err := models.GetTeShe()
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				beego.Info(products)
+				this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			if getType == 3 {
+				// [getType == 3 获取特价商品]
+				products, err := models.GetTejia()
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				beego.Info(products)
+				this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
+			if getType == 4 {
+				// [getType == 4 获取抢购商品]
+				products, err := models.GetQiangGou()
+				if err != nil {
+					beego.Info(err.Error())
+					this.Data["json"] = map[string]interface{}{"status": 400, "msg": " 获取商品失败,请稍后再试！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
+					this.ServeJSON()
+					return
+				}
+				beego.Info(products)
+				this.Data["json"] = map[string]interface{}{"status": 200, "products": products, "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.ServeJSON()
+				return
+			}
 		}
 
 		if options == 1 {

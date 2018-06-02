@@ -38,9 +38,12 @@ func (this *WxHelperController) Post() {
 		//获取openid
 		case "getOpenId":
 			this.getOpenId()
-			//发起支付
+			//小程序发起支付
 		case "goPay":
 			this.goPay()
+			//APP端发起支付
+		case "appGoPay":
+			this.appGoPay()
 			//获取支付签名
 		case "getPaySign":
 			this.getPaySign()
@@ -243,6 +246,22 @@ func (this *WxHelperController) goPay() {
 	return
 
 }
+
+//APP发起支付----------------------------------------------
+func (this *WxHelperController) appGoPay() {
+	// appid := this.GetString("appid")
+	// attach := this.GetString("attach")
+	// body := this.GetString("body")
+	// mch_id := this.GetString("mch_id")
+	// nonce_str := this.GetString("nonce_str")
+	// notify_url := this.GetString("notify_url")
+	// out_trade_no := this.GetString("out_trade_no")
+	// spbill_create_ip := this.GetString("spbill_create_ip")
+	// total_fee := this.GetString("total_fee")
+	// trade_type := this.GetString("trade_type")
+	// sign := this.GetString("sign")
+}
+
 func randStr(strSize int, randType string) string {
 
 	var dictionary string
