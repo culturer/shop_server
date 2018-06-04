@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>advertise接口测试</title>
+</head>
+<body>
+	<form action="/advertise " method="POST">
+		<label>[options == isCorver  设置首页轮播]</label>
+		<div>options:<input type="text" value="isCorver" name="options"></div>
+		<div>productId:<input type="text" name="productId"></div>
+		<div>pictureId:<input type="text" name="pictureId"></div>
+		<div>isCorver:<input type="text" name="isCorver"></div>
+		<input type="submit" name="设置轮播图"Submit/>
+	</form>	
+	<br>
+	<br>
+	<br>
+	<form action="/advertise " method="POST">
+		<label>[options == getCovers  获取首页轮播]</label>
+		<div>options:<input type="text" value="getCovers" name="options"></div>
+		<input type="submit" name="获取轮播"Submit/>
+	</form>	
+</body>
+</html>

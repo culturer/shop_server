@@ -14,7 +14,7 @@ func init() {
 	//初始化路由
 	initRouter()
 	//初始化过滤器
-	initFilter()
+	// initFilter()
 
 }
 
@@ -44,6 +44,8 @@ func initRouter() {
 	beego.Router("/procurement", &controllers.ProcurementController{})
 	//获取信息接口
 	beego.Router("/wxhelper", &controllers.WxHelperController{})
+	//广告接口
+	beego.Router("/advertise", &controllers.AdvertiseController{})
 }
 
 //初始化过滤器

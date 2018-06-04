@@ -12,7 +12,7 @@ type AdvertiseController struct {
 }
 
 func (c *AdvertiseController) Get() {
-	c.TplName = "AdvertiseController.html"
+	c.TplName = "advertise_test.html"
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -34,6 +34,15 @@ func (this *AdvertiseController) Post() {
 		case "getCovers":
 			//获取广告轮播
 			this.getCovers()
+		case "addadvertise":
+			//增加广告
+			this.addAdvertise()
+		case "deladvertise":
+			//删除广告
+			this.delAdvertise()
+		case "mdfyAdvertise":
+			//修改广告
+			this.mdfyAdvertise()
 		}
 	}
 
@@ -66,6 +75,48 @@ func (this *AdvertiseController) getCovers() {
 		return
 	}
 	this.Data["json"] = map[string]interface{}{"status": 200, "covers": covers, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+}
+
+func (this *AdvertiseController) addAdvertise() {
+	advertise := new(models.TAdvertise)
+	this.ParseForm(advertise)
+	advertiseId, err := models.AddAdvertise(advertise)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	this.Data["json"] = map[string]interface{}{"status": 200, "advertiseId": advertiseId, "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+}
+
+func (this *AdvertiseController) delAdvertise() {
+	advertiseId, _ := strconv.ParseInt(this.Input().Get("advertiseId"), 10, 64)
+	err := models.DelAdvertise(advertiseId)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	this.Data["json"] = map[string]interface{}{"status": 200, "msg": "删除广告成功!", "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+}
+
+func (this *AdvertiseController) mdfyAdvertise() {
+	advertise := new(models.TAdvertise)
+	this.ParseForm(advertise)
+	num, err := models.MdfyAdvertise(advertise)
+	beego.Info(num)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	this.Data["json"] = map[string]interface{}{"status": 200, "msg": "修改广告成功!", "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
 	return
 }

@@ -25,5 +25,7 @@ func RegiesterDB() {
 	orm.RegisterModel(new(TOrderItem))
 	orm.RegisterModel(new(TOrder))
 	orm.RegisterModel(new(TAddress))
+	orm.RegisterModel(new(TAdvertise))
+	orm.RegisterModel(new(TComment))
 
 }

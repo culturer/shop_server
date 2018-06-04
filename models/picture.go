@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
+	// "github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	// _ "github.com/go-sql-driver/mysql"
 	// "fmt"
@@ -14,7 +14,7 @@ type TPicture struct {
 	ProductId int64
 	//图片链接
 	Url string
-	//封面?
+	//封面
 	IsCover bool
 }
 
@@ -67,24 +67,10 @@ func IsCover(pictureId, productId int64, isCorver bool) error {
 	return err
 }
 
-func GetCorver() ([]*Cover, error) {
+func GetCorver() ([]*TPicture, error) {
 	pictures := make([]*TPicture, 0)
 	o := orm.NewOrm()
 	qs := o.QueryTable("t_picture")
 	_, err := qs.Filter("is_cover", 1).All(&pictures)
-	covers := make([]*Cover, 0)
-	for i := 0; i < len(pictures); i++ {
-		myProduct, err := GetProductById(pictures[i].ProductId)
-		if err != nil {
-			beego.Info(err)
-			return covers, err
-		}
-		covers[i] = &Cover{pic: pictures[i], product: myProduct}
-	}
-	return covers, err
-}
-
-type Cover struct {
-	pic     *TPicture
-	product *TProduct
+	return pictures, err
 }
