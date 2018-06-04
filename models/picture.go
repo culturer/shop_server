@@ -1,8 +1,10 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	// _ "github.com/go-sql-driver/mysql"
+	// "fmt"
 )
 
 //产品图片
@@ -43,6 +45,46 @@ func GetPicturesByProductId(productId int64) ([]*TPicture, error) {
 	return pictures, err
 }
 
-func MdfyPictureIsCover(productId int64, isCover bool) error {
-	return nil
+func GetPictureById(pictureId int64) (*TPicture, error) {
+	o := orm.NewOrm()
+	picture := new(TPicture)
+	qs := o.QueryTable("t_picture")
+	err := qs.Filter("id", pictureId).One(picture)
+	return picture, err
+}
+
+//是否首页轮播
+func IsCover(pictureId, productId int64, isCorver bool) error {
+	picture, err := GetPictureById(pictureId)
+	if err != nil {
+		return err
+	}
+	if picture != nil {
+		picture.IsCover = isCorver
+	}
+	o := orm.NewOrm()
+	_, err = o.Update(picture)
+	return err
+}
+
+func GetCorver() ([]*Cover, error) {
+	pictures := make([]*TPicture, 0)
+	o := orm.NewOrm()
+	qs := o.QueryTable("t_picture")
+	_, err := qs.Filter("is_cover", 1).All(&pictures)
+	covers := make([]*Cover, 0)
+	for i := 0; i < len(pictures); i++ {
+		myProduct, err := GetProductById(pictures[i].ProductId)
+		if err != nil {
+			beego.Info(err)
+			return covers, err
+		}
+		covers[i] = &Cover{pic: pictures[i], product: myProduct}
+	}
+	return covers, err
+}
+
+type Cover struct {
+	pic     *TPicture
+	product *TProduct
 }
