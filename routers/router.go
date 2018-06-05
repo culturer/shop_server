@@ -14,7 +14,7 @@ func init() {
 	//初始化路由
 	initRouter()
 	//初始化过滤器
-	// initFilter()
+	initFilter()
 
 }
 
