@@ -53,18 +53,22 @@ func (this *AdvertiseController) Post() {
 }
 
 func (this *AdvertiseController) isCorver() {
+
 	productId, _ := strconv.ParseInt(this.Input().Get("productId"), 10, 64)
 	pictureId, _ := strconv.ParseInt(this.Input().Get("pictureId"), 10, 64)
 	isCorver, _ := strconv.ParseBool(this.Input().Get("isCorver"))
+
 	err := models.IsCover(pictureId, productId, isCorver)
 	if err != nil {
 		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
 		this.ServeJSON()
 		return
 	}
+
 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": " 设置封面成功！ ", "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
 	return
+
 }
 
 func (this *AdvertiseController) getCovers() {

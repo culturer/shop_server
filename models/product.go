@@ -30,7 +30,6 @@ type TProduct struct {
 	Desc string `orm:"type(text);null"`
 	//产品备注
 	Msg string `orm:"type(text);null"`
-
 	//创建时间
 	CreateTime string
 	//封面图片
@@ -49,6 +48,11 @@ type TProduct struct {
 	IsTeJia bool
 	//限时抢购
 	IsQiangGou bool
+	//规格
+	// 例 ： {[{name:"five",price:100,title:"苹果5斤"},{name:"six",Price:100，title:"苹果6斤"},{name:"servern",Price:200，title:"苹果7斤"},{name:"eight",Price:300，title:"苹果8斤"}]}
+	IsGuiGe     bool   //是否有规格
+	GuiGe       string `orm:"type(text);null"`
+	selectGuiGe string //选择的规格 如five
 }
 
 //-------------------------------基本方法------------------------------------------
@@ -112,7 +116,6 @@ func EditProduct(product *TProduct) (int, error) {
 	}
 	//orm模块
 	ormHelper := orm.NewOrm()
-
 	//错误对象
 	num, err := ormHelper.Update(product)
 	if err != nil {
@@ -213,11 +216,8 @@ func GetTeShe() ([]*TProduct, error) {
 	var sql string
 	//var num int64
 	var err error
-
 	sql = fmt.Sprintf("select t_product.* ,t_pic.url as cover_url from t_product left join (select * from t_picture where is_cover=1) as t_pic on t_product.id=t_pic.product_id  where is_te_she = 1 order by sort_id ")
-
 	_, err = o.Raw(sql).QueryRows(&products)
-
 	beego.Info(sql)
 	return products, err
 

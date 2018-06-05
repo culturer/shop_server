@@ -67,14 +67,14 @@ func (this *PictureController) Post() {
 
 			if err != nil {
 				beego.Error(err)
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
 			pictureId, err := this.addPicture(productId, myPath, isCover)
 			if err != nil {
 				beego.Error(err)
-				this.Data["json"] = map[string]interface{}{"status": 400, "msg": "upload fail", "time": time.Now().Format("2006-01-02 15:04:05")}
+				this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
 				this.ServeJSON()
 				return
 			}
