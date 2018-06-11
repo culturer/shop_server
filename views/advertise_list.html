@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>推广软文</title>
+	<link rel="stylesheet" type="text/css" href="../static/css/element.css">
+    <style>
+        .el-header, .el-footer {
+            padding-top: 1em;
+        }
+
+        .el-aside {
+            background-color: #D3DCE6;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-main {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+        /*---------*/
+        .main-contaner {
+            padding: 0;
+        }
+
+        .el-main {
+            padding: 10px;
+            overflow-y: scroll
+        }
+
+        .nav-tab {
+            background-color: #E9EEF3;
+        }
+
+        .el-tabs.el-tabs--card.el-tabs--top {
+            height: 100%
+        }
+
+        .el-tabs__content {
+            height: calc(100% - 41px)
+        }
+    </style>
+</head>
+<body>
+	<body style="margin:0;box-sizing:border-box">
+
+    <div id="app">
+        <el-container style="height:100vh;">
+
+		  <el-header>
+		  	<el-row :gutter="10">
+                <el-col :span="8" style="text-align:right">
+                    <el-button @click="toggleSelection()">取消选择</el-button>
+                    <el-button type="warning" @click="batchDelete()">移除</el-button>
+                    <el-button type="success" @click="dialogVisible=true;form.Id=0">新增</el-button>
+                </el-col>
+            </el-row>
+
+		  </el-header>
+
+		  <el-main>Main</el-main>
+
+        </el-container>
+    </div>
+</body>
+</html>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>用户列表</title>
+    <title>商品列表</title>
     <link rel="stylesheet" type="text/css" href="../static/css/element.css">
     <style>
         .el-header, .el-footer {
-            padding-top: 1em;
+         padding-top:1em;
         }
 
         .el-aside {
@@ -17,6 +17,7 @@
         .el-main {
             background-color: #ffffff;
             color: #333;
+           
         }
 
         body > .el-container {
@@ -26,53 +27,52 @@
         .main-contaner {
             padding: 0;
         }
-
         .el-main {
-            padding: 10px;
-            overflow-y: scroll
+            padding:10px;
+            overflow-y:scroll
         }
-
         .nav-tab {
             background-color: #E9EEF3;
         }
-
-        .el-tabs.el-tabs--card.el-tabs--top {
+         .el-tabs.el-tabs--card.el-tabs--top {
             height: 100%
         }
-
         .el-tabs__content {
-            height: calc(100% - 41px)
+        height:calc(100% - 41px)
         }
     </style>
 </head>
-
-
 <body style="margin:0;box-sizing:border-box">
 
     <div id="app">
         <el-container style="height:100vh;">
             <el-header>
                 <el-row :gutter="10">
-                    <el-col :span="16" style="height:1px">
-                        <!--<el-input placeholder="请输入内容" class="input-with-select">
-                            <el-select value="1" slot="prepend" placeholder="请选择">
-                                <el-option label="全部类型" value="1"></el-option>
-                                <el-option label="海鲜" value="2"></el-option>
-                                <el-option label="水果" value="3"></el-option>
+                    <el-col :span="16">
+
+                        <el-input placeholder="请输入内容" class="input-with-select">
+                            <el-select style="width:100px;max-width:200px" v-model="productTypeId" slot="prepend" placeholder="全部">
+                                <el-option label="全部" value="0" >
+
+                                </el-option>
+                                <el-option :label="item.TypeName" v-for="item in typeList" :value="item.Id">
+
+                                </el-option>
+
                             </el-select>
                             <el-button slot="append" icon="el-icon-search"></el-button>
-                        </el-input>-->
+                        </el-input>
                     </el-col>
-
+                   
                     <el-col :span="8" style="text-align:right">
                         <el-button @click="toggleSelection()">取消选择</el-button>
                         <el-button type="warning" @click="batchDelete()">移除</el-button>
-                        <!--<el-button type="success" @click="dialogVisible=true">新增</el-button>-->
+                        <el-button type="success" @click="location.href='?page=product_add'">新增</el-button>
+                        <el-button type="primary" @click="location.reload()">刷新</el-button>
                     </el-col>
-                </el-row>
-
+                </el-row>                
             </el-header>
-
+          
             <el-main class="main-contaner">
                 <template>
 
@@ -89,16 +89,19 @@
                                          width="40">
                         </el-table-column>
                         <el-table-column prop="Name"
-                                         label="名字"
-                                         sortable
-                                        >
-                        </el-table-column>
-                        <el-table-column prop="Tel"
-                                         label="电话"
+                                         label="标题"
                                          sortable
                                          width="380">
                         </el-table-column>
-                        >
+                        <el-table-column prop="Price"
+                                         label="价格"
+                                         sortable
+                                         width="180">
+                        </el-table-column>
+                        <el-table-column prop="Count"
+                                         sortable
+                                         label="库存">
+                        </el-table-column>
                         <el-table-column prop="CreateTime"
                                          sortable
                                          label="时间">
@@ -107,9 +110,9 @@
                                          sortable
                                          label="操作">
                             <template slot-scope="scope">
-                                <el-button @click.native.prevent="editOne(scope.row.Id)"
+                                <el-button @click.native.prevent="goToEditPage(scope.row.Id)"
                                            type="text"
-                                           size="small" disabled>
+                                           size="small">
                                     编辑
                                 </el-button>
                                 <el-button @click.native.prevent="deleteProduct(scope.row.Id)"
@@ -135,63 +138,47 @@
                     </div>
                 </template>
             </el-main>
-
+          
         </el-container>
-        <!--<el-dialog title="新增分类"
-                   :visible.sync="dialogVisible"
-                   width="30%">
-            <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="分类名称">
-                    <el-input v-model="form.TypeName"></el-input>
-                </el-form-item>
-                <el-form-item label="排序id">
-                    <el-input-number v-model="form.SortId" controls-position="right" :min="0"></el-input-number>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="addOne()">确 定</el-button>
-            </span>
-        </el-dialog>-->
+
     </div>
     <script type="text/javascript" src="../static/js/vue.min.js"></script>
     <script type="text/javascript" src="../static/js/element.min.js"></script>
     <script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript">
-
+  
         var vm = new Vue({
             el: '#app',
             data: {
-                selectIds: [],
+                selectIds:[],
                 tableData: "",
-                pageSize: "3",
-                pageTotal: "0",
-                currentPage: "1",
+                pageSize: "5",
+                pageTotal:"0",
+                currentPage:"1",
                 loading: true,
-                //dialogVisible: false,
-                //form: {
-                //    TypeName: "",
-                //    SortId: ""
-                //}
-
+                typeList: "",
+                productTypeId:""
             },
             methods: {
 
                 handleSizeChange(val) {
                     console.log(`每页 ${val} 条`);
                     this.pageSize = val
-                    getPageData(this.currentPage, this.pageSize);
+                    getPageData(this.currentPage, this.pageSize, this.productTypeId);
                 },
                 handleCurrentChange(val) {
                     console.log(`当前页    ${val}`);
-                    getPageData(val, this.pageSize);
+                    getPageData(val, this.pageSize, this.productTypeId);
                 },
                 deleteProduct(id) {
                     var result = confirm("移除后数据不可恢复")
                     if (result) {
                         deleteData(id)
                     }
-
+                    
+                },
+                goToEditPage(id) {
+                    location.href ='?page=product_edit&productId='+id
                 },
                 toggleSelection(rows) {
                     if (rows) {
@@ -218,36 +205,35 @@
                         for (var i = 0; i < items.length; i++) {
                             this.selectIds.push(items[i].Id)
                         }
-
+                       
                     }
 
                 },
-                addOne(item) {
-                    if (this.form.TypeName == "" || this.form.SortId == "") {
-                        alert("请填写完整参数")
-                        return
-                    }
-                    submitData()
+
+               
+            
+
+            },
+            watch: {
+                productTypeId: function (val) {
+                    getPageData(this.currentPage, this.pageSize, this.productTypeId);
                 }
-
-
-
             }
 
         });
-        getPageData(1, 10);
+        getPageData(1,5,0);
         //初始化数据
-        function getPageData(pageNo, pageSize) {
+        function getPageData(pageNo, pageSize, productTypeId) {
             vm.currentPage = pageNo;
             vm.pageSize = pageSize;
 
             $.ajax({
-                url: location.origin + "/user",
+                url: location.origin + "/products",
                 data: {
-                    //types: 0,
+                    types: 1,
                     options: 0,
-                    // productTypeId: 1,
-                    getType: 2,
+                    productTypeId: productTypeId,
+                    getType: 0,
                     pageNo: pageNo,
                     pageSize: pageSize
 
@@ -256,9 +242,9 @@
                 dataType: "json",
                 success: function (e) {
                     if (e.status == "200") {
-                        var list = e.users;
+                        var list = e.products;
                         for (var i = 0; i < list.length; i++) {
-                            list[i].Name = decodeURIComponent(list[i].Name)
+                            list[i].Name = decodeURIComponent(list[i].Name)                        
                         }
                         vm.tableData = list
                         vm.pageTotal = e.totalPage
@@ -268,7 +254,7 @@
                     }
                 },
                 complete: function (e) {
-                    // $("body").loader("hide")
+                   // $("body").loader("hide")
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("状态：" + textStatus + "；出错提示：" + errorThrown);
@@ -278,11 +264,11 @@
         //删除数据
         function deleteData(id) {
             $.ajax({
-                url: location.origin + "/user",
+                url: location.origin + "/products?page=product",
                 data: {
-                    //types: 0,
+                    types: 1,
                     options: 2,
-                    userId: id
+                    productId: id
                 },
                 type: "post",
                 dataType: "json",
@@ -293,7 +279,7 @@
                         getPageData(1, vm.pageSize);
                         //vm.tableData = vm.tableData.filter(item => { return item.Id != id })
                         //vm.pageTotal = vm.tableData.length
-                        // vm.pageTotal = list.length
+                       // vm.pageTotal = list.length
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
@@ -318,65 +304,45 @@
                 }
             }
             console.log(vm.tableData)
-
+           
         }
-        //新增数据
-        function submitData() {
+        getTypeData(1, 0);
+        //获取类型数据
+        function getTypeData(pageNo, pageSize) {          
+
             $.ajax({
                 url: location.origin + "/products",
                 data: {
                     types: 0,
-                    options: 1,
-                    typeName: encodeURIComponent(vm.form.TypeName),
-                    sortId: vm.form.SortId
+                    options: 0,
+                    // productTypeId: 1,
+                    //getType: 0,
+                    pageNo: pageNo,
+                    pageSize: pageSize
+
                 },
                 type: "post",
                 dataType: "json",
                 success: function (e) {
-
                     if (e.status == "200") {
-                        getPageData(1, vm.pageSize);
+                        var list = e.productTypes;
+                        for (var i = 0; i < list.length; i++) {
+                            list[i].TypeName = decodeURIComponent(list[i].TypeName)
+                        }
+                        vm.typeList = list
                     } else if (e.status == "400") {
                         alert(e.msg)
                     }
                 },
                 complete: function (e) {
-                    vm.dialogVisible = false
+                    // $("body").loader("hide")
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("状态：" + textStatus + "；出错提示：" + errorThrown);
                 },
             });
         }
-        //修改数据
-        function editData() {
-            $.ajax({
-                url: location.origin + "/products",
-                data: {
-                    types: 0,
-                    options: 3,
-                    mdfyType: 1,
-                    typeName: decodeURIComponent(vm.form.TypeName),
-                    sortId: vm.form.SortId
-                },
-                type: "post",
-                dataType: "json",
-                success: function (e) {
-
-                    if (e.status == "200") {
-                        getPageData(1, vm.pageSize);
-                    } else if (e.status == "400") {
-                        alert(e.msg)
-                    }
-                },
-                complete: function (e) {
-                    vm.dialogVisible = false
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
-                },
-            });
-        }
+        //
     </script>
 </body>
 </html>
