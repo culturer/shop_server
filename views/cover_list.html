@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户列表</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/element.css">
+    <style>
+        .el-header, .el-footer {
+            padding-top: 1em;
+        }
+
+        .el-aside {
+            background-color: #D3DCE6;
+            color: #333;
+            text-align: center;
+        }
+
+        .el-main {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+        /*---------*/
+        .main-contaner {
+            padding: 0;
+        }
+
+        .el-main {
+            padding: 10px;
+            overflow-y: scroll
+        }
+
+        .nav-tab {
+            background-color: #E9EEF3;
+        }
+
+        .el-tabs.el-tabs--card.el-tabs--top {
+            height: 100%
+        }
+
+        .el-tabs__content {
+            height: calc(100% - 41px)
+        }
+    </style>
+</head>
+
+
+<body style="margin:0;box-sizing:border-box">
+
+    <div id="app">
+        <el-container style="height:100vh;">
+            <el-header>
+                <el-row :gutter="10">
+                    <el-col :span="16" style="height:1px">
+                        <!--<el-input placeholder="请输入内容" class="input-with-select">
+                            <el-select value="1" slot="prepend" placeholder="请选择">
+                                <el-option label="全部类型" value="1"></el-option>
+                                <el-option label="海鲜" value="2"></el-option>
+                                <el-option label="水果" value="3"></el-option>
+                            </el-select>
+                            <el-button slot="append" icon="el-icon-search"></el-button>
+                        </el-input>-->
+                    </el-col>
+
+                    <el-col :span="8" style="text-align:right">
+                        <el-button @click="toggleSelection()">取消选择</el-button>
+                        <el-button type="warning" @click="batchDelete()">移除</el-button>
+                        <!--<el-button type="success" @click="dialogVisible=true">新增</el-button>-->
+                    </el-col>
+                </el-row>
+
+            </el-header>
+
+            <el-main class="main-contaner">
+                <template>
+
+                    <el-table :data="tableData"
+                              v-loading="loading"
+                              ref="multipleTable"
+                              style="width: 100%"
+                              @select="selectOne"
+                              @select-all="selectAll"
+                              stripe
+                              :default-sort="{prop: 'date', order: 'descending'}">
+                        <el-table-column type="selection"
+                                         prop="Id"
+                                         width="40">
+                        </el-table-column>
+                        <el-table-column prop="Name"
+                                         label="名字"
+                                         sortable
+                                        >
+                        </el-table-column>
+                        <el-table-column prop="Tel"
+                                         label="电话"
+                                         sortable
+                                         width="380">
+                        </el-table-column>
+                        >
+                        <el-table-column prop="CreateTime"
+                                         sortable
+                                         label="时间">
+                        </el-table-column>
+                        <el-table-column prop="Operate"
+                                         sortable
+                                         label="操作">
+                            <template slot-scope="scope">
+                                <el-button @click.native.prevent="editOne(scope.row.Id)"
+                                           type="text"
+                                           size="small" disabled>
+                                    编辑
+                                </el-button>
+                                <el-button @click.native.prevent="deleteProduct(scope.row.Id)"
+                                           type="text"
+                                           size="small">
+                                    移除
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </template>
+                <template>
+
+                    <div class="block">
+                        <el-pagination @size-change="handleSizeChange"
+                                       @current-change="handleCurrentChange"
+                                       :current-page="currentPage"
+                                       :page-sizes="[5, 10, 20]"
+                                       :page-size="pageSize"
+                                       layout="total, sizes, prev, pager, next, jumper"
+                                       :total="pageTotal">
+                        </el-pagination>
+                    </div>
+                </template>
+            </el-main>
+
+        </el-container>
+        <!--<el-dialog title="新增分类"
+                   :visible.sync="dialogVisible"
+                   width="30%">
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="分类名称">
+                    <el-input v-model="form.TypeName"></el-input>
+                </el-form-item>
+                <el-form-item label="排序id">
+                    <el-input-number v-model="form.SortId" controls-position="right" :min="0"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addOne()">确 定</el-button>
+            </span>
+        </el-dialog>-->
+    </div>
+    <script type="text/javascript" src="../static/js/vue.min.js"></script>
+    <script type="text/javascript" src="../static/js/element.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript">
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                selectIds: [],
+                tableData: "",
+                pageSize: "3",
+                pageTotal: "0",
+                currentPage: "1",
+                loading: true,
+                //dialogVisible: false,
+                //form: {
+                //    TypeName: "",
+                //    SortId: ""
+                //}
+
+            },
+            methods: {
+
+                handleSizeChange(val) {
+                    console.log(`每页 ${val} 条`);
+                    this.pageSize = val
+                    getPageData(this.currentPage, this.pageSize);
+                },
+                handleCurrentChange(val) {
+                    console.log(`当前页    ${val}`);
+                    getPageData(val, this.pageSize);
+                },
+                deleteProduct(id) {
+                    var result = confirm("移除后数据不可恢复")
+                    if (result) {
+                        deleteData(id)
+                    }
+
+                },
+                toggleSelection(rows) {
+                    if (rows) {
+                        rows.forEach(row => {
+                            this.$refs.multipleTable.toggleRowSelection(row);
+                        });
+                    } else {
+                        this.$refs.multipleTable.clearSelection();
+                    }
+                },
+                selectOne(item, row) {
+                    if (item.length == 0) {
+                        this.selectIds = this.selectIds.filter(obj => { return obj != row.Id })
+                    } else {
+                        this.selectIds.push(row.Id)
+                    }
+                    //console.log(vm.tableData)
+
+                },
+                selectAll(items) {
+                    if (items.length == 0) {
+                        this.selectIds = []
+                    } else {
+                        for (var i = 0; i < items.length; i++) {
+                            this.selectIds.push(items[i].Id)
+                        }
+
+                    }
+
+                },
+                addOne(item) {
+                    if (this.form.TypeName == "" || this.form.SortId == "") {
+                        alert("请填写完整参数")
+                        return
+                    }
+                    submitData()
+                }
+
+
+
+            }
+
+        });
+        getPageData(1, 10);
+        //初始化数据
+        function getPageData(pageNo, pageSize) {
+            vm.currentPage = pageNo;
+            vm.pageSize = pageSize;
+
+            $.ajax({
+                url: location.origin + "/user",
+                data: {
+                    //types: 0,
+                    options: 0,
+                    // productTypeId: 1,
+                    getType: 2,
+                    pageNo: pageNo,
+                    pageSize: pageSize
+
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+                    if (e.status == "200") {
+                        var list = e.users;
+                        for (var i = 0; i < list.length; i++) {
+                            list[i].Name = decodeURIComponent(list[i].Name)
+                        }
+                        vm.tableData = list
+                        vm.pageTotal = e.totalPage
+                        vm.loading = false
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    // $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //删除数据
+        function deleteData(id) {
+            $.ajax({
+                url: location.origin + "/user",
+                data: {
+                    //types: 0,
+                    options: 2,
+                    userId: id
+                },
+                type: "post",
+                dataType: "json",
+                async: false,
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        getPageData(1, vm.pageSize);
+                        //vm.tableData = vm.tableData.filter(item => { return item.Id != id })
+                        //vm.pageTotal = vm.tableData.length
+                        // vm.pageTotal = list.length
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    // $("body").loader("hide")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //批量删除
+        function batchDelete() {
+            if (vm.selectIds.length == 0) {
+                alert("请选择表格中要删除的数据")
+            }
+            var e = confirm("数据删除将无法恢复")
+            if (e) {
+                for (var i = 0; i < vm.selectIds.length; i++) {
+                    deleteData(vm.selectIds[i])
+                }
+            }
+            console.log(vm.tableData)
+
+        }
+        //新增数据
+        function submitData() {
+            $.ajax({
+                url: location.origin + "/products",
+                data: {
+                    types: 0,
+                    options: 1,
+                    typeName: encodeURIComponent(vm.form.TypeName),
+                    sortId: vm.form.SortId
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        getPageData(1, vm.pageSize);
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    vm.dialogVisible = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+        //修改数据
+        function editData() {
+            $.ajax({
+                url: location.origin + "/products",
+                data: {
+                    types: 0,
+                    options: 3,
+                    mdfyType: 1,
+                    typeName: decodeURIComponent(vm.form.TypeName),
+                    sortId: vm.form.SortId
+                },
+                type: "post",
+                dataType: "json",
+                success: function (e) {
+
+                    if (e.status == "200") {
+                        getPageData(1, vm.pageSize);
+                    } else if (e.status == "400") {
+                        alert(e.msg)
+                    }
+                },
+                complete: function (e) {
+                    vm.dialogVisible = false
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("状态：" + textStatus + "；出错提示：" + errorThrown);
+                },
+            });
+        }
+    </script>
+</body>
+</html>

@@ -27,6 +27,9 @@
         <div class="form-group">
             <input type="text" id="attr_partnerName" required class="form-control" placeholder="合作商名称" />
         </div>
+         <div class="form-group">
+            <input type="text" id="attr_partnerTel" required class="form-control" placeholder="合作商电话" />
+        </div>
         <div class="form-group">
             <input id="attr_address" class="form-control" placeholder="合作商地址" />
             
@@ -93,6 +96,7 @@
                     //types: 1,
                     options: 1,
                     partnerName: encodeURIComponent($("#attr_partnerName").val()),
+                    tel:encodeURIComponent($("#attr_partnerTel").val()),
                     address: encodeURIComponent($("#attr_address").val()),
                     position: encodeURIComponent($("#attr_position").val()),
                     desc: encodeURIComponent($("#attr_desc").code()),

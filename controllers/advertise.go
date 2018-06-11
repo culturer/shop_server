@@ -11,8 +11,18 @@ type AdvertiseController struct {
 	beego.Controller
 }
 
-func (c *AdvertiseController) Get() {
-	c.TplName = "advertise_test.html"
+func (this *AdvertiseController) Get() {
+	var page string
+	this.Ctx.Input.Bind(&page, "page")
+	if page == "cover_list" {
+		this.TplName = "cover_list.html"
+	} else if page == "advertise_list" {
+		this.TplName = "advertise_list.html"
+	} else if page == "product_type_list" {
+		this.TplName = "product_type_list.html"
+	} else if page == "product_edit" {
+		this.TplName = "product_edit.html"
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -43,6 +53,8 @@ func (this *AdvertiseController) Post() {
 		case "mdfyAdvertise":
 			//修改广告
 			this.mdfyAdvertise()
+		case "getAdvertiseByPage":
+			this.getAdvertiseByPage()
 		}
 	}
 
@@ -121,6 +133,22 @@ func (this *AdvertiseController) mdfyAdvertise() {
 		return
 	}
 	this.Data["json"] = map[string]interface{}{"status": 200, "msg": "修改广告成功!", "time": time.Now().Format("2006-01-02 15:04:05")}
+	this.ServeJSON()
+	return
+}
+
+func (this *AdvertiseController) getAdvertiseByPage() {
+	index, _ := strconv.Atoi(this.Input().Get("index"))
+	size, _ := strconv.Atoi(this.Input().Get("size"))
+	where := this.Input().Get("where")
+
+	advertises, count, err := models.GetAdvertiseByPage(index, size, where)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"status": 400, "msg": err.Error(), "time": time.Now().Format("2006-01-02 15:04:05")}
+		this.ServeJSON()
+		return
+	}
+	this.Data["json"] = map[string]interface{}{"status": 200, "advertises": advertises, "count": count, "time": time.Now().Format("2006-01-02 15:04:05")}
 	this.ServeJSON()
 	return
 }

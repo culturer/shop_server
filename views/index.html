@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Epr首页管理</title>
+    <title>ERP管理系统</title>
     <link rel="stylesheet" type="text/css" href="../static/css/element.css">
     <style>
         .el-header, .el-footer {
@@ -66,9 +66,8 @@
 
                             <el-menu-item index="1-1" title="分类列表" href="#fenlei" @click="addTab(proTypeData)">分类列表</el-menu-item>
                             <el-menu-item index="1-2" title="商品列表" href="#shangpin" @click="addTab(proData)">商品列表</el-menu-item>
-
-
                         </el-submenu>
+
                         <el-menu-item index="2">
                             <i class="el-icon-menu"></i>
                             <span slot="title" title="订单管理" href="#dingdan" @click="addTab(orderData)">订单管理</span>
@@ -79,8 +78,58 @@
                         </el-menu-item>
                         <el-menu-item index="4" >
                             <i class="el-icon-setting"></i>
-                            <span slot="title">分销商管理</span>
+                            <span slot="title" title="商务合作"  href="#partner" @click="addTab(partnerData)">商务合作</span>
                         </el-menu-item>
+                        
+                        <el-submenu index="5">
+                            <template slot="title">
+                                <i class="el-icon-edit"></i>
+                                <span slot="title">推广管理</span>
+                            </template>
+                            <!-- 首页轮播图 -->
+                            <el-menu-item index="5-1" href="#cover_list" @click="addTab(cover_list)">首页轮播</el-menu-item>
+                            <!-- 推广文章 -->
+                            <el-menu-item index="5-2" href="#advertise_list" @click="addTab(advertise_list)">推广软文</el-menu-item>
+                            <!-- 热销商品，特色商品，特价商品，抢购 -->
+                            <el-menu-item index="5-3" >推广活动</el-menu-item> 
+                        </el-submenu>
+
+                         <el-submenu index="6">
+                            <template slot="title">
+                                <i class="el-icon-news"></i>
+                                <span slot="title">账务管理</span>
+                            </template>
+                            <!-- 首页轮播图 -->
+                            <el-menu-item index="6-1" >账单详情</el-menu-item>
+                            <!-- 推广文章 -->
+                            <el-menu-item index="6-2" >统计数据</el-menu-item>
+                            <!-- 热销商品，特色商品，特价商品，抢购 -->
+                            <el-menu-item index="6-3" >数据分析</el-menu-item> 
+                        </el-submenu>
+                        <el-submenu index="7">
+                            <template slot="title">
+                                <i class="el-icon-service"></i>
+                                <span slot="title">售后管理</span>
+                            </template>
+                            <!-- 首页轮播图 -->
+                            <el-menu-item index="7-1" >客户投诉</el-menu-item>
+                            <!-- 推广文章 -->
+                            <el-menu-item index="7-2" >订单跟进</el-menu-item>
+                            <!-- 热销商品，特色商品，特价商品，抢购 -->
+                            <el-menu-item index="7-3" >退货管理</el-menu-item> 
+                        </el-submenu>
+                        <el-submenu index="8">
+                            <template slot="title">
+                                <i class="el-icon-time"></i>
+                                <span slot="title">折扣优惠</span>
+                            </template>
+                            <!-- 首页轮播图 -->
+                            <el-menu-item index="8-1" >满减券</el-menu-item>
+                            <!-- 推广文章 -->
+                            <el-menu-item index="8-2" >现金券</el-menu-item>
+                            <!-- 热销商品，特色商品，特价商品，抢购 -->
+                            <el-menu-item index="8-3" >折扣券</el-menu-item> 
+                        </el-submenu>
                     </el-menu>
 
                 </el-aside>
@@ -155,14 +204,14 @@
                 currentPage4: 4,
                 editableTabsValue2: '1',
                 editableTabs2: [{
-                    title: '商品列表',
+                    title: '商品管理',
                     name: '1',
                     content: location.origin + "/products?page=product_list"
                 }],
                 tabIndex: 1,
                 isCollapse: false,
                 proData: {
-                    title: "商品列表",
+                    title: "商品管理",
                     href: location.origin + "/products?page=product_list"
                 },
                 userData: {
@@ -174,8 +223,20 @@
                     href: location.origin + "/order?page=order_list"
                 },
                 proTypeData: {
-                    title: "分类列表",
+                    title: "分类管理",
                     href: location.origin + "/products?page=product_type_list"
+                },
+                partnerData: {
+                    title: "商务合作",
+                    href: location.origin + "/partner?page=partner_list"
+                },
+                cover_list: {
+                    title: "首页轮播",
+                    href: location.origin + "/advertise?page=cover_list"
+                },
+                advertise_list: {
+                    title: "首页轮播",
+                    href: location.origin + "/advertise?page=advertise_list"
                 },
                 user:""
             },

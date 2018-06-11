@@ -14,11 +14,12 @@
         .el-aside {
             background-color: #D3DCE6;
             color: #333;
-            text-align: center;
+            text-align: start;
         }
 
         .el-main {
             background-color: #ffffff;
+            margin-top: 40px;
             color: #333;
         }
 
@@ -92,7 +93,7 @@
 
             <el-main class="main-contaner">
 
-                <el-row type="flex" class="row-bg" justify="center">
+                <el-row type="flex" class="row-bg" justify="start">
 
                     <!--订单状态-->
                     <template style="float:left;">
@@ -105,7 +106,7 @@
                             <el-tab-pane label="退单" name="hadCancel"></el-tab-pane>
                         </el-tabs>
                     </template>
-                    <el-col :span="18">
+                    <el-col :span="22">
                         <!--表格部分-->
                         <template>
                             <el-table :data="tableData"
